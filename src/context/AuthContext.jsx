@@ -1,98 +1,107 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import api from "../Api/Api";
-import { toast } from "react-toastify";
+import { createContext, useState, useEffect ,useContext } from "react";
 
 export const AuthContext = createContext();
-
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState("user");
   const [loading, setLoading] = useState(true);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Load user from localStorage
+  // 🔄 Load user from localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem("loggedInUser");
+    const storedUser = localStorage.getItem("user");
+
     if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error("Error parsing stored user:", error);
-        localStorage.removeItem("loggedInUser");
-      }
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      setRole(parsedUser.role);
     }
+
     setLoading(false);
   }, []);
 
-  // Login function
-  const login = async (email, password) => {
-    const { data } = await api.get("/users", { params: { email } });
-    const foundUser = data[0];
+  // ✅ REGISTER
+const register = async (firstName, lastName, email, password) => {
+  try {
+    const response = await fetch("http://localhost:5000/api/users/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ firstName, lastName, email, password }),
+    });
 
-    if (!foundUser) throw new Error("User not found");
-    if (foundUser.password !== password) throw new Error("Invalid password");
-    if (foundUser.isBlock) throw new Error("Account is blocked");
+    const data = await response.json();
 
-    const updatedUser = { ...foundUser, isLoggedIn: true };
-    await api.patch(`/users/${foundUser.id}`, updatedUser);
-
-    localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
-    localStorage.setItem("userId", updatedUser.id);
-    setUser(updatedUser);
-    toast.success("Login successful!");
-
-    return updatedUser;
-  };
-
-  // Logout function
-  const logout = async () => {
-    if (user?.id) {
-      await api.patch(`/users/${user.id}`, { isLoggedIn: false });
+    if (!response.ok) {
+      throw new Error(data.message || "Registration failed");
     }
-    localStorage.removeItem("loggedInUser");
-    localStorage.removeItem("userId");
+
+    // auto login after register
+    return await login(email, password);
+
+  } catch (error) {
+    console.error("Registration error:", error);
+    throw error;
+  }
+};
+
+  // ✅ LOGIN
+  const login = async (email, password) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+
+      const userData = data.user;
+
+      const loggedInUser = {
+        id: userData.id,
+        name: `${userData.firstName} ${userData.lastName || ""}`.trim(),
+        email: userData.email,
+        role: userData.role, // string ("user" / "admin")
+        blocked: userData.blocked,
+        token: data.token,
+      };
+
+      setUser(loggedInUser);
+      setRole(userData.role);
+
+      localStorage.setItem("user", JSON.stringify(loggedInUser));
+      localStorage.setItem("token", data.token);
+
+      return loggedInUser;
+
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
+  };
+
+  // ✅ LOGOUT
+  const logout = () => {
     setUser(null);
-    toast.warning("Logout successful");
+    setRole("user");
+
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+
+    return true;
   };
-
-  // Update user for wishlist/cart
-  const updateUser = (updatedUserData) => {
-    localStorage.setItem("loggedInUser", JSON.stringify(updatedUserData));
-    setUser(updatedUserData);
-  };
-
-
-
-  const wishlistCount = user?.wishlist?.length || 0;
-  const cartCount = user?.cart?.length || 0;
 
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        login,
-        logout,
-        updateUser,
-        wishlistCount,
-        cartCount,
-        profileOpen,
-        setProfileOpen,
-        mobileMenuOpen,
-        setMobileMenuOpen,
-        loading,
-        isAuthenticated: !!user,
-      }}
+      value={{ user, role, loading, register, login, logout }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-
-// Custom hook
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within an AuthProvider");
-  return context;
-};
-
-

@@ -1,169 +1,138 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { MagnifyingGlassIcon, HeartIcon, ShoppingBagIcon, UserIcon, Bars3Icon } from '@heroicons/react/24/outline';
-import { useAuth } from '../context/AuthContext';
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { 
+  Search, 
+  ShoppingBag, 
+  Leaf, 
+  Heart, 
+  User, 
+  Menu, 
+  X 
+} from "lucide-react";
+import { gsap } from "gsap";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = () => {
-  const {
-    user,
-    logout,
-    cartCount,
-    wishlistCount,
-    profileOpen,
-    setProfileOpen,
-    mobileMenuOpen,
-    setMobileMenuOpen,
-  } = useAuth();
-
-  const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navRef = useRef(null);
+  const { user } = useAuth();
   const location = useLocation();
 
-  const links = [
-    { name: 'Home', path: '/' },
-    { name: 'Shop', path: '/Shop' },
-    { name: 'About', path: '/About' },
-    { name: 'Contact', path: '/contact' }
+  // FIX: Run animation on every mount and location change
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.fromTo(navRef.current, 
+        { y: -100, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 1, ease: "power4.out" }
+      );
+    });
+
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 30);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      ctx.revert(); // Clean up GSAP to prevent memory leaks
+    };
+  }, [location.pathname]); // Re-runs if the route changes
+
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "Shop", path: "/shop" },
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" },
   ];
 
-  const navClass = (path) =>
-    `transition-all duration-300 font-medium px-4 py-2 rounded-lg ${
-      location.pathname === path
-        ? 'bg-[#4CBB17] text-white shadow-lg scale-105'
-        : 'text-[#4CBB17] hover:bg-[#48872B] hover:text-white hover:shadow-md'
-    }`;
-
   return (
-    <>
-      <nav className="bg-white shadow-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 flex justify-between h-16 items-center">
-          {/* Logo */}
-          <Link to="/" className="flex items-center group">
-            <span className="ml-3 text-2xl font-bold bg-gradient-to-r from-[#36a104] to-[#8ef435] bg-clip-text text-transparent">
-              Falconz.
+    <nav 
+      ref={navRef}
+      className={`fixed top-0 w-full z-[110] px-6 transition-all duration-500 ${
+        isScrolled || isMobileMenuOpen
+        ? "bg-white/90 backdrop-blur-xl border-b border-gray-200 py-3" 
+        : "bg-transparent py-5"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        
+        {/* --- LOGO --- */}
+        <Link to="/" className="flex items-center gap-2 group">
+          {/* <div className="bg-[#1a1a1a] p-2 rounded-xl group-hover:bg-green-600 transition-all duration-300">
+            <Leaf className="text-white" size={20} />
+          </div> */}
+          <span className="text-xl font-black tracking-tighter text-[#1a1a1a]">
+            FALCON<span className="text-green-600">FRUITS</span>
+          </span>
+        </Link>
+
+        {/* --- CENTER: MAIN NAVIGATION --- */}
+        <div className="hidden lg:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.name} 
+              to={link.path}
+              className={`text-sm font-bold transition-colors hover:text-green-600 ${
+                location.pathname === link.path ? "text-green-600" : "text-gray-600"
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
+
+        {/* --- RIGHT: UTILITY BUTTONS --- */}
+        <div className="flex items-center gap-3">
+          
+          {/* Wishlist */}
+          <Link to="/wishlist" className="p-2.5 text-gray-600 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+            <Heart size={20} />
+          </Link>
+
+          {/* Cart */}
+          <Link to="/cart" className="relative p-2.5 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all">
+            <ShoppingBag size={20} />
+            <span className="absolute top-1 right-1 w-4 h-4 bg-green-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full">
+              0
             </span>
           </Link>
 
-          {/* Desktop Links */}
-          <div className="hidden lg:flex space-x-1">
-            {links.map(link => (
-              <Link key={link.path} to={link.path} className={navClass(link.path)}>
-                {link.name}
-              </Link>
-            ))}
-          </div>
+          {/* Profile (Desktop) */}
+          <Link to="/profile" className="hidden sm:flex p-2.5 text-gray-600 hover:text-green-600 hover:bg-gray-100 rounded-xl transition-all">
+            <User size={20} />
+          </Link>
 
-          {/* Right Icons */}
-          <div className="flex items-center space-x-3">
-            {/* Wishlist */}
-            <button onClick={() => navigate('/wishList')} className="relative p-2 rounded-full hover:bg-green-100">
-              <HeartIcon className="h-6 w-6 text-green-600" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
-                  {wishlistCount}
-                </span>
-              )}
-            </button>
-
-            {/* Cart */}
-            <button onClick={() => navigate('/Cart')} className="relative p-2 rounded-full hover:bg-green-100">
-              <ShoppingBagIcon className="h-6 w-6 text-green-600" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-            </button>
-
-            {/* Profile */}
-            <button onClick={() => setProfileOpen(!profileOpen)} className="p-2 rounded-full hover:bg-green-100">
-              <UserIcon className="h-6 w-6 text-green-600" />
-            </button>
-
-            {/* Mobile Menu Button */}
-            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 rounded-full hover:bg-green-100">
-              <Bars3Icon className="h-6 w-6 text-green-600" />
-            </button>
-          </div>
+          {/* Mobile Toggle */}
+          <button 
+            className="lg:hidden p-2.5 text-gray-900"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
         </div>
-      </nav>
+      </div>
 
-      {/* Profile Popup */}
-      {profileOpen && (
-        <div className="absolute top-16 right-4 bg-white shadow-lg rounded-lg p-4 border w-60 z-50">
-          {user ? (
-            <div className="space-y-2 text-sm">
-              <p className="font-bold text-green-600">Hello, {user.name}</p>
-              <button
-                onClick={() => { navigate('/Profile'); setProfileOpen(false); }}
-                className="w-full bg-green-600 text-white py-2 mt-2 rounded-lg text-sm"
-              >
-                Profile
-              </button>
-              <button
-                onClick={() => { navigate('/Orders'); setProfileOpen(false); }}
-                className="w-full bg-green-600 text-white py-2 mt-2 rounded-lg text-sm"
-              >
-                Order History
-              </button>
-              <button
-                onClick={()=>logout()}
-                className="w-full bg-red-500 text-white py-2 mt-2 rounded-lg text-sm hover:bg-red-600"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-2 text-sm">
-              <p className="font-bold text-gray-700">Welcome Guest</p>
-              <button onClick={() => { navigate('/Login'); setProfileOpen(false); }} className="w-full bg-green-600 text-white py-2 rounded-lg text-sm hover:bg-green-700">
-                Login
-              </button>
-              <button onClick={() => { navigate('/Signup'); setProfileOpen(false); }} className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg text-sm hover:bg-gray-300">
-                Sign Up
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-white shadow-md border-t">
-          <div className="flex flex-col space-y-2 p-4">
-            {links.map(link => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
-                  location.pathname === link.path
-                    ? 'bg-[#4CBB17] text-white'
-                    : 'text-[#4CBB17] hover:bg-[#48872B] hover:text-white'
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
-
-            {/* Extra buttons for mobile */}
-            <button
-              onClick={() => { navigate('/Cart'); setMobileMenuOpen(false); }}
-              className="flex items-center gap-2 px-3 py-2 text-[#4CBB17] hover:bg-green-100 rounded-md"
+      {/* --- MOBILE MENU --- */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden absolute top-full left-0 w-full bg-white border-b border-gray-200 p-6 flex flex-col gap-4 shadow-xl">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.name} 
+              to={link.path} 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-lg font-bold text-gray-800 border-b border-gray-50 pb-2"
             >
-              <ShoppingBagIcon className="h-5 w-5" />
-              Cart ({cartCount})
-            </button>
-
-            <button
-              onClick={() => { navigate('/wishList'); setMobileMenuOpen(false); }}
-              className="flex items-center gap-2 px-3 py-2 text-[#4CBB17] hover:bg-green-100 rounded-md"
-            >
-              <HeartIcon className="h-5 w-5" />
-              Wishlist ({wishlistCount})
-            </button>
+              {link.name}
+            </Link>
+          ))}
+          <div className="flex gap-4 pt-2">
+            <Link to="/profile" className="flex-1 text-center py-3 bg-gray-100 rounded-xl font-bold">Profile</Link>
+            <Link to="/wishlist" className="flex-1 text-center py-3 bg-gray-100 rounded-xl font-bold">Wishlist</Link>
           </div>
         </div>
       )}
-    </>
+    </nav>
   );
 };
 

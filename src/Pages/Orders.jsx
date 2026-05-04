@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../Api/Api';
-import Navbar from '../component/Navbar';
+// import Navbar from '../component/Navbar';
 import Footer from '../component/Footer';
 
 const Orders = () => {

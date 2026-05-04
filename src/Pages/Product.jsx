@@ -305,9 +305,9 @@ import { FaHeart, FaRegHeart, FaCartPlus, FaArrowLeft, FaStar, FaShare, FaMinus,
 import { useAuth } from '../context/AuthContext';
 import api from '../Api/Api';
 import Footer from '../component/Footer';
-import Navbar from '../component/Navbar';
+// import Navbar from '../component/Navbar';
 
-function Product() {
+function product() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -677,4 +677,4 @@ function Product() {
   );
 }
 
-export default Product;
+export default product;

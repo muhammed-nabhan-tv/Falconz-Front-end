@@ -1,110 +1,7 @@
-// import React from "react";
-// import { Routes, Route } from "react-router-dom";
-// import Navbar from "./component/Navbar";
-// import Footer from "./component/Footer"; 
-// import Home from "./Pages/Home";
-// import Shop from "./Pages/Shop";
-// import About from "./Pages/About";
-// import Contact from "./Pages/Contact";
-// import Login from "./Auth/Login";
-// import SignUp from "./Auth/signup";
-// import Cart from "./Pages/Cart";
-// import WishList from "./Pages/WishList";
-// import Profile from "./Pages/Profile";
-// import Product from "./Pages/Product";
-// import Orders from "./Pages/Orders";
-// import { ToastContainer } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-// import ProtectedRoute from "./context/ProtectedRoute"; // ✅ using your Auth-based protected route
-// import AdminDashboard from "./Admin/Admin";
-// import { BrainCog } from "lucide-react";
-
-// function App() {
-//   return (
-//     <>
-//       {/* <Router> */}
-//       {/* <BrowserRouter> */}
-//         <Routes>
-//           {/* Public routes */}
-//           <Route path="/" element={<Home />} />
-//           <Route path="/shop" element={<Shop />} />
-//           <Route path="/about" element={<About />} />
-//           <Route path="/contact" element={<Contact />} />
-//           <Route path="/product/:id" element={<Product />} />
-//           {/* Guest-only routes (requireAuth = false) */}
-//           <Route
-//             path="/login"
-//             element={
-//               <ProtectedRoute requireAuth={false}>
-//                 <Login />
-//               </ProtectedRoute>
-//             }
-//           />
-//           <Route
-//             path="/signup"
-//             element={
-//               <ProtectedRoute requireAuth={false}>
-//                 <SignUp />
-//               </ProtectedRoute>
-//             }
-//           />
-
-//           <Route
-//            path="/admindashboard"
-//            element={
-//              <ProtectedRoute requireAuth={true} requiredRole="admin">
-//                 <AdminDashboard />
-//              </ProtectedRoute>
-//            }
-//           />
-
-//           {/* Protected routes (requireAuth = true by default) */}
-//           <Route
-//             path="/cart"
-//             element={
-//               <ProtectedRoute>
-//                 <Cart />
-//               </ProtectedRoute>
-//             }
-//           />
-//           <Route
-//             path="/wishlist"
-//             element={
-//               <ProtectedRoute>
-//                 <WishList />
-//               </ProtectedRoute>
-//             }
-//           />
-//           <Route
-//             path="/profile"
-//             element={
-//               <ProtectedRoute>
-//                 <Profile />
-//               </ProtectedRoute>
-//             }
-//           />
-//           <Route
-//             path="/orders"
-//             element={
-//               <ProtectedRoute>
-//                 <Orders />
-//               </ProtectedRoute>
-//             }
-//           />
-//         </Routes>
-//       {/* </Router> */}
-//       {/* </BrowserRouter> */}
-//       <ToastContainer />
-//     </>
-//   );
-// }
-
-// export default App;
-
 
 import React, { useEffect } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import Navbar from "./component/Navbar";
+// import Navbar from "./component/Navbar";
 import Footer from "./component/Footer"; 
 import Home from "./Pages/Home";
 import Shop from "./Pages/Shop";
@@ -113,18 +10,20 @@ import Contact from "./Pages/Contact";
 import Login from "./Auth/Login";
 import SignUp from "./Auth/signup";
 import Cart from "./Pages/Cart";
-import WishList from "./Pages/WishList";
+import Wishlist from "./Pages/wishlistPage";
 import Profile from "./Pages/Profile";
 import Product from "./Pages/Product";
 import Orders from "./Pages/Orders";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ProtectedRoute from "./context/ProtectedRoute"; 
+// import ProtectedRoute from "./context/ProtectedRoute"; 
 import AdminDashboard from "./Admin/Admin"
 import AllProducts from "./Admin/AllProducts";
 import AllOrders from "./Admin/AllOrders";
 import AllUsers from "./Admin/AllUsers";             
 import Checkout from "./Pages/Checkout";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+import { CartProvider } from "./context/cartContext";
+import { WishlistProvider } from "./context/WishlistContext";
 
 function AppContent() {
   const navigate = useNavigate();
@@ -151,8 +50,9 @@ function AppContent() {
 
   return (
     <>
-      {showNavFooter && <Navbar />}
-
+      {/* {showNavFooter && <Navbar />} */}
+      <WishlistProvider>
+    <CartProvider>
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Home />} />
@@ -183,33 +83,33 @@ function AppContent() {
         <Route
           path="/admindashboard"
           element={
-            <ProtectedRoute requireAuth={true} requiredRole="admin">
+            // <ProtectedRoute requireAuth={true} requiredRole="admin">
               <AdminDashboard />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
         <Route
           path="/allorders"
           element={
-            <ProtectedRoute requireAuth={true} requiredRole="admin">
+            // <ProtectedRoute requireAuth={true} requiredRole="admin">
               <AllOrders />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
         <Route
           path="/products"
           element={
-            <ProtectedRoute requireAuth={true} requiredRole="admin">
+            // <ProtectedRoute requireAuth={true} requiredRole="admin">
               <AllProducts />
-            </ProtectedRoute>
+            // {/* </ProtectedRoute> */}
           }
         />
         <Route
           path="/users"
           element={
-            <ProtectedRoute requireAuth={true} requiredRole="admin">
+            // <ProtectedRoute requireAuth={true} requiredRole="admin">
               <AllUsers />
-            </ProtectedRoute>
+            // {/* </ProtectedRoute> */}
           }
         />
 
@@ -217,39 +117,41 @@ function AppContent() {
         <Route
           path="/cart"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Cart />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
         <Route
           path="/wishlist"
           element={
-            <ProtectedRoute>
-              <WishList />
-            </ProtectedRoute>
+            // <ProtectedRoute>
+              <Wishlist />
+            // </ProtectedRoute>
           }
         />
         <Route
           path="/profile"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Profile />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
         <Route
           path="/orders"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <Orders />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
       </Routes>
 
-      {showNavFooter && <Footer />}
+      {/* {showNavFooter && <Footer />} */}
       <ToastContainer />
+          </CartProvider>
+          </WishlistProvider>
     </>
   );
 }

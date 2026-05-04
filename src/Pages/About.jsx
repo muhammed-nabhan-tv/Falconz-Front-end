@@ -1,237 +1,194 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Navbar from '../component/Navbar';
+import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
+import { 
+  ShieldCheck, 
+  Leaf, 
+  Truck, 
+  Star, 
+  Target, 
+  Eye, 
+  Plus,
+  ArrowUpRight
+} from "lucide-react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Navbar from "../component/Navbar";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const About = () => {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Hero Entrance
+      gsap.from(".about-hero-text", {
+        y: 60,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.2,
+        ease: "power4.out",
+      });
+            // 2. Horizontal Marquee
+            gsap.to(".marquee-inner", {
+              xPercent: -50,
+              ease: "none",
+              duration: 15,
+              repeat: -1,
+            });
+      // Bento Items Reveal
+      gsap.from(".bento-item", {
+        scrollTrigger: {
+          trigger: ".bento-grid",
+          start: "top 85%",
+        },
+        scale: 0.9,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 0.8,
+        ease: "back.out(1.7)",
+      });
+    }, containerRef);
+    return () => ctx.revert();
+  }, []);
+
   const features = [
-    {
-      icon: '🔒',
-      title: 'Secure Payment',
-      description: 'Your transactions are protected with bank-level security. We use SSL encryption to keep your payment information safe.'
-    },
-    {
-      icon: '🌿',
-      title: '100% Organic',
-      description: 'All our products are certified organic, sourced directly from local farms. No pesticides, no chemicals, just pure nature.'
-    },
-    {
-      icon: '🚚',
-      title: 'Free Delivery',
-      description: 'Enjoy free delivery on all orders above $50. Fast and reliable shipping to your doorstep within 24 hours.'
-    },
-    {
-      icon: '⭐',
-      title: 'Quality Guarantee',
-      description: 'We guarantee the freshness and quality of all our products. Not satisfied? Get a full refund, no questions asked.'
-    }
-  ];
-
-  const stats = [
-    { number: '10,000+', label: 'Happy Customers' },
-    { number: '500+', label: 'Organic Products' },
-    { number: '50+', label: 'Local Farms' },
-    { number: '24/7', label: 'Customer Support' }
-  ];
-
-  const team = [
-    {
-      name: 'Sarah Johnson',
-      role: 'Founder & CEO',
-      image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150',
-      description: 'Passionate about bringing fresh, organic food to every household.'
-    },
-    {
-      name: 'Mike Chen',
-      role: 'Head of Operations',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
-      description: 'Ensuring smooth delivery and quality control across all operations.'
-    },
-    {
-      name: 'Emily Davis',
-      role: 'Product Manager',
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
-      description: 'Curating the best organic products from trusted local farms.'
-    }
+    { icon: <ShieldCheck className="text-[#0bdf47]" />, title: 'Secure Payment', desc: 'Bank-level SSL encryption for every transaction.' },
+    { icon: <Leaf className="text-[#0bdf47]" />, title: '100% Organic', desc: 'Certified pesticide-free produce from local soil.' },
+    { icon: <Truck className="text-[#0bdf47]" />, title: 'Turbo Delivery', desc: 'Freshness delivered to your door in under 24 hours.' },
+    { icon: <Star className="text-[#0bdf47]" />, title: 'Quality First', desc: 'Not satisfied? Instant refund, no questions asked.' }
   ];
 
   return (
-  
-    <div className="min-h-screen bg-gray-50">
-     {/* main section */}
-      <section className="bg-green-600 text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">About Falconz</h1>
-          <p className="text-xl md:text-2xl text-green-100 max-w-3xl mx-auto leading-relaxed">
-            Your trusted partner for fresh, organic groceries delivered straight to your doorstep. 
-            We're committed to quality, sustainability, and your well-being.
+    <div ref={containerRef} className="bg-[#0D0D0D] text-white selection:bg-[#98D8AA] selection:text-black overflow-hidden">
+      <Navbar />
+
+      {/* --- HERO SECTION --- */}
+      <section className="relative pt-40 pb-20 px-6 max-w-7xl mx-auto text-center">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full opacity-20 pointer-events-none">
+          <div className="absolute top-20 left-1/4 w-72 h-72 bg-[#436850] blur-[120px] rounded-full" />
+        </div>
+        
+        <div className="relative z-10 space-y-6">
+          <div className="about-hero-text inline-block px-4 py-1.5 border border-white/10 rounded-full text-xs font-black tracking-widest uppercase bg-white/5">
+            Our Journey
+          </div>
+          <h1 className="about-hero-text text-7xl md:text-9xl font-black uppercase tracking-tighter leading-none">
+            Falcon<span className="text-transparent border-text">Fruit</span> Story
+          </h1>
+          <p className="about-hero-text max-w-2xl mx-auto text-gray-400 text-lg md:text-xl font-medium pt-4">
+            Founded in 2020, we reimagined the grocery chain by connecting the soil 
+            directly to your digital doorstep.
           </p>
         </div>
       </section>
 
-      {/* story part */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Our Story</h2>
-              <p className="text-gray-600 mb-4 text-lg leading-relaxed">
-                Founded in 2020, Falconz started with a simple mission: to make fresh, 
-                organic groceries accessible to everyone. What began as a small local 
-                delivery service has grown into a trusted online marketplace connecting 
-                local farmers with health-conscious consumers.
-              </p>
-              <p className="text-gray-600 mb-6 text-lg leading-relaxed">
-                We believe that everyone deserves access to high-quality, chemical-free 
-                food. That's why we work directly with local organic farms to bring you 
-                the freshest produce, while supporting sustainable farming practices.
-              </p>
-              <div className="flex gap-4">
-                <Link 
-                  to="/shop" 
-                  className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-                >
-                  Start Shopping
-                </Link>
-                <Link 
-                  to="/contact" 
-                  className="border border-green-600 text-green-600 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors"
-                >
-                  Contact Us
-                </Link>
-              </div>
-            </div>
-            <div className="relative">
-              <img 
-                src="https://i.pinimg.com/1200x/ad/19/18/ad1918466c0c5e9b55d59ee773aaecb6.jpg" 
-                alt="Fresh organic vegetables" 
-                className="rounded-2xl shadow-2xl"
-              />
-              <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold text-green-600">3+ Years</div>
-                <div className="text-gray-600">Of Trusted Service</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why us section */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Why Choose Falconz?</h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              We're committed to providing the best shopping experience with quality you can trust
+      {/* --- STORY BENTO GRID --- */}
+      <section className="px-6 py-20 max-w-7xl mx-auto bento-grid">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          {/* Main Story Card */}
+          <div className="bento-item md:col-span-8 bg-[#1A1A1A] rounded-[3rem] p-12 border border-white/5 relative overflow-hidden group">
+            <h2 className="text-4xl font-bold mb-6">Born from the Earth</h2>
+            <p className="text-gray-400 text-lg leading-relaxed max-w-lg">
+              FreshRoot started with a simple problem: quality organic food was too hard to find. 
+              We spent years building relationships with local farmers who care about the planet 
+              as much as we do. Today, we're a bridge between sustainable soil and health-conscious souls.
             </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <div key={index} className="text-center p-6 bg-green-50 rounded-2xl hover:shadow-lg transition-shadow">
-                <div className="text-4xl mb-4">{feature.icon}</div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="py-16 bg-green-600 text-white">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            {stats.map((stat, index) => (
-              <div key={index}>
-                <div className="text-3xl md:text-4xl font-bold mb-2">{stat.number}</div>
-                <div className="text-green-100 text-lg">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* our aim */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <div className="bg-white p-8 rounded-2xl shadow-lg">
-              <div className="text-4xl mb-4">🎯</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Our Mission</h3>
-              <p className="text-gray-600 leading-relaxed">
-                To revolutionize the way people access fresh, organic food by creating 
-                a seamless connection between local farmers and health-conscious consumers. 
-                We're dedicated to promoting sustainable agriculture and making organic 
-                living accessible to all.
-              </p>
-            </div>
-            <div className="bg-white p-8 rounded-2xl shadow-lg">
-              <div className="text-4xl mb-4">🔭</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Our Vision</h3>
-              <p className="text-gray-600 leading-relaxed">
-                We envision a future where every household has easy access to fresh, 
-                chemical-free food. A world where local farmers thrive, and consumers 
-                enjoy the health benefits of truly organic produce delivered with 
-                convenience and care.
-              </p>
+            <div className="absolute -right-10 -bottom-10 opacity-10 group-hover:opacity-20 transition-opacity">
+               <Leaf size={300} />
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Our team */}
-      <section className="py-16 bg-gray-100">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">Meet Our Team</h2>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Passionate individuals dedicated to bringing you the best organic experience
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {team.map((member, index) => (
-              <div key={index} className="bg-white rounded-2xl p-6 text-center shadow-lg hover:shadow-xl transition-shadow">
-                <img 
-                  src={member.image} 
-                  alt={member.name}
-                  className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-                />
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">{member.name}</h3>
-                <p className="text-green-600 font-medium mb-3">{member.role}</p>
-                <p className="text-gray-600 text-sm">{member.description}</p>
+          {/* Stats Card */}
+          <div className="bento-item md:col-span-4 bg-[#0bdf47] rounded-[3rem] p-10 text-black flex flex-col justify-between">
+            <div className="space-y-8">
+              <div>
+                <div className="text-5xl font-black">10K+</div>
+                <div className="font-bold uppercase tracking-widest text-sm opacity-70">Happy Souls</div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* kepp in touch */}
-      <section className="py-16 bg-green-600 text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Experience Freshness?</h2>
-          <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of satisfied customers who trust us for their daily organic needs
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              to="/shop" 
-              className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Shop Now
-            </Link>
-            <Link 
-              to="/contact" 
-              className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-            >
-              Get In Touch
+              <div>
+                <div className="text-5xl font-black">50+</div>
+                <div className="font-bold uppercase tracking-widest text-sm opacity-70">Local Farms</div>
+              </div>
+            </div>
+            <Link to="/shop" className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+               <ArrowUpRight />
             </Link>
           </div>
+
+          {/* Mission & Vision */}
+          <div className="bento-item md:col-span-6 bg-white/5 border border-white/10 rounded-[3rem] p-10 space-y-6">
+            <Target className="text-[#0bdf47]" size={40} />
+            <h3 className="text-2xl font-bold uppercase">Our Mission</h3>
+            <p className="text-gray-400 leading-relaxed">
+              To revolutionize access to organic nutrition by creating a zero-waste 
+              ecosystem that rewards both the farmer and the consumer.
+            </p>
+          </div>
+
+          <div className="bento-item md:col-span-6 bg-white/5 border border-white/10 rounded-[3rem] p-10 space-y-6">
+            <Eye className="text-[#0bdf47]" size={40} />
+            <h3 className="text-2xl font-bold uppercase">Our Vision</h3>
+            <p className="text-gray-400 leading-relaxed">
+              A future where "Organic" isn't a premium choice, but the standard for every 
+              household, regardless of their location.
+            </p>
+          </div>
         </div>
       </section>
+
+      {/* --- WHY US (MARQUEE STYLE) --- */}
+      <div className="py-20 bg-[#0bdf47] text-black overflow-hidden whitespace-nowrap rotate-[1deg] scale-105 z-20 relative">
+        <div className="marquee-inner flex font-black text-4xl md:text-6xl uppercase tracking-tighter">
+          {[...Array(5)].map((_, i) => (
+            <span key={i} className="flex items-center">
+              Pesticide Free <Plus size={40} className="mx-8" /> 
+              Farm Direct <Plus size={40} className="mx-8" />
+              Eco Packaging <Plus size={40} className="mx-8" />
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* --- FEATURES GRID --- */}
+      <section className="py-32 px-6 max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+        {features.map((f, i) => (
+          <div key={i} className=" p-8 rounded-[2.5rem] bg-[#1A1A1A] border border-white/5 hover:border-[#0bdf47]/50 transition-all text-center">
+            <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              {f.icon}
+            </div>
+            <h4 className="text-xl font-bold mb-3 uppercase tracking-tight">{f.title}</h4>
+            <p className="text-gray-500 text-sm">{f.desc}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* --- FOOTER CTA --- */}
+      <section className="py-40 px-6 text-center bg-gradient-to-t from-[#0bdf47]/10 to-transparent">
+        <h2 className="text-5xl md:text-8xl font-black mb-12 tracking-tighter uppercase leading-none">
+          Ready to join the <br/> <span className="text-[#0bdf47]">Movement?</span>
+        </h2>
+        <div className="flex flex-col sm:flex-row gap-6 justify-center">
+          <Link to="/shop" className="bg-white text-black px-12 py-5 rounded-full font-black text-xl hover:scale-110 transition-transform">
+            GO TO MARKET
+          </Link>
+          <Link to="/contact" className="border border-white/20 text-white px-12 py-5 rounded-full font-black text-xl hover:bg-white/10 transition-all">
+            GET IN TOUCH
+          </Link>
+        </div>
+      </section>
+
+      {/* CSS for the Outline Text Effect */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .border-text {
+          -webkit-text-stroke: 1.5px rgba(255,255,255,0.3);
+        }
+        @media (min-width: 768px) {
+          .border-text { -webkit-text-stroke: 2px rgba(255,255,255,0.3); }
+        }
+      `}} />
     </div>
   );
 };
 
 export default About;
-

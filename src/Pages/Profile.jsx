@@ -301,7 +301,7 @@
 import React, { useEffect, useState } from "react";
 import { UserIcon, ShoppingBagIcon, HeartIcon, EnvelopeIcon, PencilSquareIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import Footer from "../component/Footer";
-import Navbar from "../component/Navbar";
+// import Navbar from "../component/Navbar";
 
 const ProfilePage = () => {
   const [user, setUser] = useState({
@@ -321,30 +321,30 @@ const ProfilePage = () => {
     email: ""
   });
 
-  useEffect(() => {
-    // Get logged-in user from localStorage (assuming this is where you store login data)
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  // useEffect(() => {
+  //   // Get logged-in user from localStorage (assuming this is where you store login data)
+  //   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
     
-    if (loggedInUser) {
-      // If you have a separate user data structure, use that
-      const userData = JSON.parse(localStorage.getItem("user")) || loggedInUser;
+  //   if (loggedInUser) {
+  //     // If you have a separate user data structure, use that
+  //     const userData = JSON.parse(localStorage.getItem("user")) || loggedInUser;
       
-      setUser({
-        name: userData.name || loggedInUser.name || "User",
-        email: userData.email || loggedInUser.email || "user@example.com",
-        cart: userData.cart || loggedInUser.cart || [],
-        wishlist: userData.wishlist || loggedInUser.wishlist || [],
-      });
+  //     setUser({
+  //       name: userData.name || loggedInUser.name || "User",
+  //       email: userData.email || loggedInUser.email || "user@example.com",
+  //       cart: userData.cart || loggedInUser.cart || [],
+  //       wishlist: userData.wishlist || loggedInUser.wishlist || [],
+  //     });
       
-      setEditedUser({
-        name: userData.name || loggedInUser.name || "User",
-        email: userData.email || loggedInUser.email || "user@example.com"
-      });
-    } else {
-      // If no user is logged in, redirect to login
-      window.location.href = "/Login";
-    }
-  }, []);
+  //     setEditedUser({
+  //       name: userData.name || loggedInUser.name || "User",
+  //       email: userData.email || loggedInUser.email || "user@example.com"
+  //     });
+  //   } else {
+  //     // If no user is logged in, redirect to login
+  //     window.location.href = "/Login";
+  //   }
+  // }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("loggedInUser");

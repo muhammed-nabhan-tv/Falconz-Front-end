@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api= axios.create({
-    baseURL:"https://ecomdb-3.onrender.com",
+    baseURL:"http://localhost:5000/api",
     headers: {"content-type": "application/json"},
 })
 export default api;
