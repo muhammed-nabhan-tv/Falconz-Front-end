@@ -1,152 +1,246 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import api from '../Api/Api';
-// import Navbar from '../component/Navbar';
-import Footer from '../component/Footer';
+import { useEffect, useState, useRef } from "react";
+import { gsap } from "gsap";
+import {
+  Package,
+  Calendar,
+  CreditCard,
+  MapPin,
+  ShoppingBag,
+} from "lucide-react";
+import Navbar from "../component/Navbar";
+import api from "../utils/axiosInstance";
 
 const Orders = () => {
-  const { user } = useAuth();
+  const containerRef = useRef(null);
+
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = user?.token;
+console.log("token:"+token)
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (!user) return;
 
-      try {
-        const { data: userData } = await api.get(`/users/${user.id}`);
-        setOrders(userData.orders || []);
-      } catch (err) {
-        console.error('Error fetching orders:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchOrders();
-  }, [user]);
-
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'success':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'failed':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+  const fetchOrders = async () => {
+    try {
+      const res = await api.get("/orders/my-orders");
+      const data = res.data;
+      setOrders(data || []);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
+    // ✅ fetch orders
+  useEffect(() => {
+    fetchOrders();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex justify-center items-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your orders...</p>
-        </div>
-      </div>
-    );
-  }
+    const ctx = gsap.context(() => {
+      gsap.from(".order-card", {
+        y: 40,
+        opacity: 0,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: "power3.out",
+      });
+    }, containerRef);
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center max-w-md mx-auto p-8 bg-white rounded-lg shadow-lg">
-          <div className="w-24 h-24 mx-auto mb-4 bg-yellow-100 rounded-full flex items-center justify-center">
-            <svg className="w-12 h-12 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Login Required</h2>
-          <p className="text-gray-600 mb-6">Please login to view your orders.</p>
-        </div>
-      </div>
-    );
-  }
-
+    return () => ctx.revert();
+  }, []);
+// console.log(orders)
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-6 border-b border-gray-200">
-            <h1 className="text-3xl font-bold text-gray-800">My Orders</h1>
-            <p className="text-gray-600 mt-2">Track and manage your purchases</p>
+    <div
+      ref={containerRef}
+      className="min-h-screen bg-[#0D0D0D] text-white"
+    >
+      <Navbar />
+
+      <section className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+
+        {/* HEADER */}
+        <div className="mb-14">
+          <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tight">
+            My Orders
+          </h1>
+
+          <p className="text-gray-400 mt-4 uppercase text-sm tracking-widest">
+            Track all your purchases
+          </p>
+        </div>
+
+        {/* LOADING */}
+        {loading ? (
+          <div className="flex items-center justify-center py-40">
+            <div className="w-16 h-16 border-4 border-[#0bdf47] border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : orders === [] ? (
+
+          /* EMPTY */
+          <div className="bg-[#1A1A1A] rounded-[3rem] p-16 text-center border border-white/5">
+            <ShoppingBag
+              size={80}
+              className="mx-auto mb-6 text-[#0bdf47]"
+            />
+
+            <h2 className="text-3xl font-black uppercase mb-4">
+              No Orders Yet
+            </h2>
+
+            <p className="text-gray-400">
+              Start shopping to see your orders here.
+            </p>
           </div>
 
-          {orders.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-4">📦</div>
-              <h3 className="text-2xl font-semibold text-gray-800 mb-2">No orders yet</h3>
-              <p className="text-gray-600 mb-6">Start shopping to see your orders here</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-200">
-              {orders.map((order) => (
-                <div key={order.id} className="p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        Order #{String(order.id).slice(-8).toUpperCase()}
-                      </h3>
-                      <p className="text-gray-600 text-sm mt-1">
-                        Placed on {formatDate(order.orderDate)}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-4 mt-2 md:mt-0">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-                        {order.status
-                          ? order.status.charAt(0).toUpperCase() + order.status.slice(1)
-                          : "Pending"}
-                      </span>
-                      <span className="text-xl font-bold text-green-600">
-                        ${order.totalAmount?.toFixed(2) || "0.00"}
+        ) : (
+
+          /* ORDERS */
+          <div className="space-y-10">
+
+            {orders.map((order) => (
+
+              <div
+                key={order._id}
+                className="order-card bg-[#1A1A1A] rounded-[3rem] p-8 md:p-10 border border-white/5"
+              >
+
+                {/* TOP */}
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 border-b border-white/10 pb-6 mb-8">
+
+                  <div>
+                    <h2 className="text-2xl font-black uppercase">
+                      Order #{order._id.slice(-6)}
+                    </h2>
+
+                    <div className="flex items-center gap-2 text-gray-400 mt-3 text-sm">
+                      <Calendar size={16} />
+
+                      <span>
+                        {new Date(order.createdAt).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                    {order.items?.slice(0, 4).map((item, index) => (
-                      <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-12 h-12 object-cover rounded"
-                        />
-                        <div className="flex-1">
-                          <p className="font-medium text-gray-800 text-sm line-clamp-1">{item.name}</p>
-                          <p className="text-gray-600 text-sm">Qty: {item.quantity}</p>
-                        </div>
-                        <p className="font-semibold text-green-600">${item.price}</p>
-                      </div>
-                    ))}
+                  <div className="flex flex-col items-start md:items-end gap-3">
 
-                    {order.items && order.items.length > 4 && (
-                      <div className="flex items-center justify-center p-3 bg-gray-100 rounded-lg">
-                        <p className="text-gray-600 text-sm">
-                          +{order.items.length - 4} more items
+                    <div
+                      className={`px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest
+                      ${
+                        order.status === "delivered"
+                          ? "bg-green-500/20 text-green-400"
+                          : order.status === "pending"
+                          ? "bg-yellow-500/20 text-yellow-400"
+                          : "bg-blue-500/20 text-blue-400"
+                      }`}
+                    >
+                      {order.status}
+                    </div>
+
+                    <div className="text-4xl font-black text-[#0bdf47]">
+                      ₹{order.totalAmount}
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* ITEMS */}
+                <div className="space-y-5 mb-8">
+
+                  {order.items.map((item) => (
+
+                    <div
+                      key={item._id}
+                      className="flex items-center justify-between bg-white/5 rounded-2xl p-5"
+                    >
+
+                      <div className="flex items-center gap-5">
+
+                        <img
+                          src={item.img}
+                          alt={item.name}
+                          className="w-20 h-20 rounded-2xl object-cover"
+                        />
+
+                        <div>
+                          <h3 className="font-black uppercase">
+                            {item.name}
+                          </h3>
+
+                          <p className="text-sm text-gray-400 mt-1">
+                            Category: {item.category}
+                          </p>
+
+                          <p className="text-sm text-gray-400">
+                            Quantity: {item.quantity}
+                          </p>
+                        </div>
+
+                      </div>
+
+                      <div className="text-right">
+                        <p className="text-xl font-black text-[#0bdf47]">
+                          ₹{item.price * item.quantity}
+                        </p>
+
+                        <p className="text-sm text-gray-400">
+                          ₹{item.price} each
                         </p>
                       </div>
-                    )}
-                  </div>
+
+                    </div>
+                  ))}
+
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+
+                {/* BOTTOM */}
+                <div className="grid md:grid-cols-2 gap-6 border-t border-white/10 pt-6">
+
+                  {/* SHIPPING */}
+                  <div className="bg-white/5 rounded-2xl p-6">
+
+                    <div className="flex items-center gap-3 mb-4">
+                      <MapPin className="text-[#0bdf47]" />
+                      <h3 className="font-black uppercase">
+                        Shipping Address
+                      </h3>
+                    </div>
+
+                    <p className="text-gray-300 leading-relaxed">
+                      {order.shippingAddress?.address}
+                      <br />
+                      {order.shippingAddress?.city}
+                      <br />
+                      {order.shippingAddress?.pincode}
+                    </p>
+
+                  </div>
+
+                  {/* PAYMENT */}
+                  <div className="bg-white/5 rounded-2xl p-6">
+
+                    <div className="flex items-center gap-3 mb-4">
+                      <CreditCard className="text-[#0bdf47]" />
+                      <h3 className="font-black uppercase">
+                        Payment
+                      </h3>
+                    </div>
+
+                    <p className="text-gray-300">
+                      {order.paymentMethod}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+            ))}
+
+          </div>
+        )}
+
+      </section>
     </div>
   );
 };

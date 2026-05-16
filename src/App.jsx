@@ -12,11 +12,11 @@ import SignUp from "./Auth/signup";
 import Cart from "./Pages/Cart";
 import Wishlist from "./Pages/wishlistPage";
 import Profile from "./Pages/Profile";
-import Product from "./Pages/Product";
+// import Product from "./Pages/Product";
+import ProductDetail from "./Pages/productDetails";
 import Orders from "./Pages/Orders";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import ProtectedRoute from "./context/ProtectedRoute"; 
 import AdminDashboard from "./Admin/Admin"
 import AllProducts from "./Admin/AllProducts";
 import AllOrders from "./Admin/AllOrders";
@@ -24,9 +24,11 @@ import AllUsers from "./Admin/AllUsers";
 import Checkout from "./Pages/Checkout";                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
 import { CartProvider } from "./context/cartContext";
 import { WishlistProvider } from "./context/WishlistContext";
-
+import { setNavigate } from "./utils/navigate";
+import {ProtectedRoute} from "./utils/ProtectedRoute"; 
 function AppContent() {
   const navigate = useNavigate();
+  setNavigate(navigate);
   const location = useLocation();
 
   // Auto redirect admin after refresh
@@ -59,23 +61,19 @@ function AppContent() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/product/:id" element={<Product />} />
+        <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/checkout" element={<Checkout />} />
         {/* Guest-only routes */}
         <Route
           path="/login"
           element={
-            // <ProtectedRoute requireAuth={false}>
               <Login />
-            // {/* </ProtectedRoute> */}
           }
         />
         <Route
           path="/signup"
           element={
-            // <ProtectedRoute requireAuth={false}>
               <SignUp />
-            // </ProtectedRoute>
           }
         />
 
@@ -83,33 +81,33 @@ function AppContent() {
         <Route
           path="/admindashboard"
           element={
-            // <ProtectedRoute requireAuth={true} requiredRole="admin">
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AdminDashboard />
-            // </ProtectedRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/allorders"
           element={
-            // <ProtectedRoute requireAuth={true} requiredRole="admin">
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AllOrders />
-            // </ProtectedRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/products"
           element={
-            // <ProtectedRoute requireAuth={true} requiredRole="admin">
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AllProducts />
-            // {/* </ProtectedRoute> */}
+           </ProtectedRoute>
           }
         />
         <Route
-          path="/users"
+          path="/allusers"
           element={
-            // <ProtectedRoute requireAuth={true} requiredRole="admin">
+            <ProtectedRoute allowedRoles={["admin"]}>
               <AllUsers />
-            // {/* </ProtectedRoute> */}
+          </ProtectedRoute>
           }
         />
 
@@ -117,33 +115,33 @@ function AppContent() {
         <Route
           path="/cart"
           element={
-            // <ProtectedRoute>
+            <ProtectedRoute>
               <Cart />
-            // </ProtectedRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/wishlist"
           element={
-            // <ProtectedRoute>
+            <ProtectedRoute>
               <Wishlist />
-            // </ProtectedRoute>
+           </ProtectedRoute>
           }
         />
         <Route
           path="/profile"
           element={
-            // <ProtectedRoute>
+            <ProtectedRoute>
               <Profile />
-            // </ProtectedRoute>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/orders"
           element={
-            // <ProtectedRoute>
+            <ProtectedRoute>
               <Orders />
-            // </ProtectedRoute>
+           </ProtectedRoute>
           }
         />
       </Routes>

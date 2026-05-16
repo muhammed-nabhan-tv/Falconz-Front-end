@@ -1,483 +1,498 @@
+// import React, { useEffect, useState, useRef, } from "react";
+// import {
+//   LayoutDashboard,
+//   Box,
+//   ShoppingBag,
+//   Users,
+//   TrendingUp,
+//   Plus,
+//   MoreHorizontal,
+//   ArrowUpRight,
+//   Search,
+//   Settings,
+// } from "lucide-react";
+// import { gsap } from "gsap";
+// import Navbar from "../component/Navbar";
+// import api from "../utils/axiosInstance";
+// import { Link } from "react-router-dom";
 
-import React, { useState, useEffect } from "react";
-import { Users, Package, ShoppingCart, BarChart3, TrendingUp, Eye, IndianRupeeIcon, Calendar, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import AdminNav from "./AdminNav";
-import Sidebar from "./Sidebar";
-import api from "../Api/Api";
-import { useNavigate } from "react-router-dom";
-import Loaders from "../../effects/Adminloader";
+
+// // const navigate = 
+// const AdminDashboard = () => {
+//   const [stats, setStats] = useState({
+//     revenue: 0,
+//     orders: 0,
+//     customers: 0,
+//     growth: "+12.5%",
+//   });
+
+//   const [orders, setOrders]   = useState([]);
+//   const [search, setSearch]   = useState("");
+//   const [loading, setLoading] = useState(true);
+
+//   const dashboardRef = useRef(null);
+
+//   // ── Fetch orders ───────────────────────────────────────────
+//   useEffect(() => {
+//     const fetchDashboardData = async () => {
+//       try {
+//         const res  = await api.get("/orders/all-orders");
+//         // FIX: axios wraps response in res.data
+//         // your API returns { orders: [...] } OR just an array — handle both
+//         const raw  = res.data;
+//         const list = Array.isArray(raw) ? raw : (raw.orders ?? []);
+
+//         setOrders(list);
+        
+//         // ── Stats from the order list ──
+//         const revenue   = list.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+//         const customers = new Set(list.map((o) => o.userId?.toString())).size;
+
+//         setStats({
+//           revenue,
+//           orders:    list.length,
+//           customers,
+//           growth:    "+12.5%",
+//         });
+//       } catch (err) {
+//         console.error("Dashboard fetch error:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchDashboardData();
+//   }, []);
+
+//   // ── GSAP entrance ──────────────────────────────────────────
+//   useEffect(() => {
+//     if (loading) return;
+//     const ctx = gsap.context(() => {
+//       gsap.from(".stat-card", {
+//         y: 30, opacity: 0, stagger: 0.1, duration: 0.8, ease: "power3.out",
+//       });
+//       gsap.from(".table-row", {
+//         x: -20, opacity: 0, stagger: 0.05, duration: 0.6, ease: "power2.out", delay: 0.4,
+//       });
+//     }, dashboardRef);
+//     return () => ctx.revert();
+//   }, [loading]);
+
+//   // ── Search filter ──────────────────────────────────────────
+//   const filtered = orders.filter((o) => {
+//     const term = search.toLowerCase();
+//     return (
+//       o._id?.toLowerCase().includes(term) ||
+//       o.shippingAddress?.address?.toLowerCase().includes(term) ||
+//       o.status?.toLowerCase().includes(term)
+//     );
+//   });
+// console.log(filtered)
+//   // ── Status badge style ─────────────────────────────────────
+//   const statusStyle = (status) => {
+//     switch (status) {
+//       case "delivered":  return "bg-green-500/10 text-green-400";
+//       case "pending":    return "bg-yellow-500/10 text-yellow-400";
+//       case "cancelled":  return "bg-red-500/10 text-red-400";
+//       case "shipped":    return "bg-blue-500/10 text-blue-400";
+//       case "confirmed":  return "bg-purple-500/10 text-purple-400";
+//       default:           return "bg-gray-500/10 text-gray-400";
+//     }
+//   };
+
+//   return (
+//     <div
+//       ref={dashboardRef}
+//       className="min-h-screen bg-[#0D0D0D] text-white selection:bg-[#98D8AA] selection:text-black"
+//     >
+//       <Navbar />
+
+//       <div className="flex pt-24">
+//         {/* ── SIDEBAR ── */}
+//         <aside className="hidden lg:flex w-72 flex-col p-6 border-r border-white/5 sticky top-24 h-[calc(100vh-6rem)]">
+//           <div className="space-y-2">
+//             {[
+//               { name: "Overview",path:"/Dashboard",   icon: <LayoutDashboard size={18} />, active: true },
+//               { name: "Products", path:"products",  icon: <Box size={18} /> },
+//               { name: "Orders", path:"/Allorder",    icon: <ShoppingBag size={18} /> },
+//               { name: "Customers",path:"/Dashboard",  icon: <Users size={18} /> },
+//               { name: "Analytics", path:"/Dashboard", icon: <TrendingUp size={18} /> },
+//               { name: "Settings", path:"/Dashboard",  icon: <Settings size={18} /> },
+//             ].map((item) => (
+//               <Link
+//                 key={item.name}
+//                 to={item.path}
+//                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+//                   item.active
+//                     ? "bg-[#0bdf47] text-black"
+//                     : "text-gray-500 hover:text-white hover:bg-white/5"
+//                 }`}
+//               >
+//                 {item.icon} {item.name}
+//               </Link>
+//             ))}
+//           </div>
+
+//           <div className="mt-auto p-6 bg-white/5 rounded-3xl border border-white/10">
+//             <p className="text-[10px] font-black uppercase text-gray-500 mb-2">
+//               System Status
+//             </p>
+//             <div className="flex items-center gap-2">
+//               <div className="w-2 h-2 bg-[#0bdf47] rounded-full animate-pulse" />
+//               <span className="text-xs font-bold">Servers Operational</span>
+//             </div>
+//           </div>
+//         </aside>
+
+//         {/* ── MAIN ── */}
+//         <main className="flex-1 p-6 lg:p-12 overflow-hidden">
+//           <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+//             <div>
+//               <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0bdf47] mb-2">
+//                 Admin Console
+//               </p>
+//               <h1 className="text-5xl font-black uppercase tracking-tighter">
+//                 Dashboard
+//               </h1>
+//             </div>
+//             {/* <button className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#0bdf47] transition-all">
+//               <Plus size={16} /> Add Product
+//             </button> */}
+//           </header>
+
+//           {/* ── STATS ── */}
+//           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
+//             {[
+//               { label: "Total Revenue",    val: `₹${stats.revenue.toFixed(2)}`, icon: <TrendingUp className="text-[#0bdf47]" /> },
+//               { label: "Total Orders",     val: stats.orders,                    icon: <ShoppingBag className="text-[#0bdf47]" /> },
+//               { label: "Total Customers",  val: stats.customers,                 icon: <Users className="text-[#0bdf47]" /> },
+//               { label: "Monthly Growth",   val: stats.growth,                    icon: <ArrowUpRight className="text-[#0bdf47]" /> },
+//             ].map((stat, i) => (
+//               <div
+//                 key={i}
+//                 className="stat-card bg-[#1A1A1A] border border-white/5 p-8 rounded-[2.5rem] relative overflow-hidden"
+//               >
+//                 <div className="relative z-10">
+//                   <div className="mb-4">{stat.icon}</div>
+//                   <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">
+//                     {stat.label}
+//                   </p>
+//                   <h3 className="text-3xl font-black">{stat.val}</h3>
+//                 </div>
+//                 <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-[#0bdf47] blur-[100px] opacity-10 rounded-full" />
+//               </div>
+//             ))}
+//           </div>
+
+//           {/* ── ORDERS TABLE ── */}
+//           <div className="bg-[#1A1A1A] border border-white/5 rounded-[3rem] p-8 lg:p-12 shadow-2xl">
+//             <div className="flex items-center justify-between mb-10">
+//               <h2 className="text-2xl font-black uppercase tracking-tight italic">
+//                 Live Orders
+//               </h2>
+//               <div className="relative">
+//                 <Search
+//                   className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+//                   size={14}
+//                 />
+//                 <input
+//                   type="text"
+//                   placeholder="Search orders..."
+//                   value={search}
+//                   onChange={(e) => setSearch(e.target.value)}
+//                   className="bg-black/20 border border-white/5 rounded-full py-2 pl-10 pr-6 text-xs outline-none focus:border-[#0bdf47]/50 transition-all"
+//                 />
+//               </div>
+//             </div>
+
+//             {loading ? (
+//               <div className="flex justify-center py-16">
+//                 <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-[#0bdf47]" />
+//               </div>
+//             ) : filtered.length === 0 ? (
+//               <div className="text-center py-16 text-gray-500 text-sm font-medium">
+//                 {search ? "No orders match your search" : "No orders yet"}
+//               </div>
+//             ) : (
+//               <div className="overflow-x-auto">
+//                 <table className="w-full text-left">
+//                   <thead>
+//                     <tr className="border-b border-white/5">
+//                       {["Order ID", "Customer", "Items", "Status", "Amount", "Date"].map((h) => (
+//                         <th key={h} className="pb-4 text-[10px] font-black uppercase tracking-widest text-gray-500">
+//                           {h}
+//                         </th>
+//                       ))}
+//                     </tr>
+//                   </thead>
+//                   <tbody className="divide-y divide-white/5">
+//                     {/* FIX: was `orders.map((orders) =>` — wrong variable name caused all the undefined errors */}
+//                     {filtered.map((order) => (
+//                       <tr
+//                         key={order._id}  //FIX: was order.items._id — _id is on the order itself 
+//                         className="table-row group hover:bg-white/[0.02] transition-colors"
+//                       >
+//                         {/* Order ID — FIX: was order.items._id */}
+//                         <td className="py-6 font-mono text-xs text-gray-400">
+//                           #{order._id.slice(-6).toUpperCase()}
+//                         </td>
+
+//                         {/* Customer — FIX: shippingAddress is on order, not order.items */}
+//                         <td className="py-6">
+//                           <div className="flex items-center gap-3">
+//                             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center text-xs font-bold">
+//                               {order.shippingAddress?.address?.[0]?.toUpperCase() || "?"}
+//                             </div>
+//                             <div>
+//                               <p className="font-bold text-sm">
+//                                 {order.shippingAddress?.address || "N/A"}
+//                               </p>
+//                               <p className="text-[10px] text-gray-500">
+//                                 {order.shippingAddress?.city}, {order.shippingAddress?.pincode}
+//                               </p>
+//                             </div>
+//                           </div>
+//                         </td>
+
+//                         {/* Items — FIX: order.items is the array, map over it */}
+//                         <td className="py-6">
+//                           <div className="flex flex-col gap-1">
+//                             {order.items.map((item, i) => (
+//                               <span key={i} className="text-xs text-gray-400">
+//                                 {item.name} × {item.quantity}
+//                               </span>
+//                             ))}
+//                           </div>
+//                         </td>
+
+//                         {/* Status — FIX: was order.items.status — status is on the order */}
+//                         <td className="py-6">
+//                           <span className={`px-3 py-1 text-[10px] font-black uppercase rounded-lg ${statusStyle(order.status)}`}>
+//                             {order.status}
+//                           </span>
+//                         </td>
+
+//                         {/* Amount — FIX: was order.items.totalAmount */}
+//                         <td className="py-6 font-black">
+//                           ₹{order.totalAmount}
+//                         </td>
+
+//                         {/* Date */}
+//                         <td className="py-6 text-xs text-gray-500">
+//                           {new Date(order.createdAt).toLocaleDateString("en-IN", {
+//                             day:   "2-digit",
+//                             month: "short",
+//                             year:  "numeric",
+//                           })}
+//                         </td>
+
+//                         {/* Action */}
+//                         {/* <td className="py-6">
+//                           <button className="p-2 text-gray-500 hover:text-white transition-colors">
+//                             <MoreHorizontal size={18} />
+//                           </button>
+//                         </td> */}
+//                       </tr>
+//                     ))}
+//                   </tbody>
+//                 </table>
+//               </div>
+//             )}
+//           </div>
+//         </main>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default AdminDashboard;
+
+
+import React, { useEffect, useState, useRef } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
+  ShoppingBag,
+  Users,
+  TrendingUp,
+  ArrowUpRight,
+  Search,
+} from "lucide-react";
+import { gsap } from "gsap";
+import Navbar from "../component/Navbar";
+import Sidebar from "./Sidebar"; // Import the new component
+import api from "../utils/axiosInstance";
 
 const AdminDashboard = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [orders, setOrders] = useState([]);
-  const [fullOrders, setFullOrders] = useState([]);
-  const [peoples, setPeoples] = useState(0);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [revenueData, setRevenueData] = useState([]);
-  const [categoryData, setCategoryData] = useState([]);
-  const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    revenue: 0,
+    orders: 0,
+    customers: 0,
+    growth: "+12.5%",
+  });
 
-  // Colors for charts
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
-  const CATEGORY_COLORS = {
-    'vegetables': '#10B981',
-    'fruits': '#F59E0B',
-    'dairy': '#3B82F6',
-    'meat': '#EF4444',
-    'Beverages & Snacks': '#8B5CF6',
-    'other': '#6B7280'
-  };
+  const [orders, setOrders] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const dashboardRef = useRef(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDashboardData = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        const res = await api.get("/orders/allorders");
+        const raw = res.data;
+        const list = Array.isArray(raw) ? raw : (raw.orders ?? []);
 
-        // Fetch users
-        const usersRes = await api.get("/users");
-        const users = usersRes.data.filter((user) => user.role?.toLowerCase() !== "admin");
-        setPeoples(users.length);
+        setOrders(list);
+        console.log(orders)
+        const revenue = list.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+        const customers = new Set(list.map((o) => o.userId?.toString())).size;
 
-        // Get all orders
-        const allOrders = users.flatMap((user) =>
-          (user.orders || []).map((order) => ({
-            id: order.id,
-            customer: user.name,
-            date: new Date(order.orderDate).toLocaleDateString(),
-            amount: order.totalAmount,
-            status: order.status,
-            items: order.items || []
-          }))
-        );
-        setFullOrders(allOrders);
-
-        const recentOrders = allOrders
-          .sort((a, b) => new Date(b.date) - new Date(a.date))
-          .slice(0, 8);
-        setOrders(recentOrders);
-
-        // Fetch products
-        const productsRes = await api.get("/Products");
-        setProducts(productsRes.data);
-
-        // Generate revenue data for chart
-        generateRevenueData(allOrders);
-        
-        // Generate category data
-        generateCategoryData(productsRes.data, allOrders);
-
-        // 3 sec delay
-        setTimeout(() => setLoading(false), 1000);
+        setStats({
+          revenue,
+          orders: list.length,
+          customers,
+          growth: "+12.5%",
+        });
       } catch (err) {
-        console.error("Failed to fetch admin dashboard data:", err);
-        setError("Failed to load dashboard data");
+        console.error("Dashboard fetch error:", err);
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchDashboardData();
   }, []);
 
-  const generateRevenueData = (allOrders) => {
-    const last6Months = [];
-    for (let i = 5; i >= 0; i--) {
-      const date = new Date();
-      date.setMonth(date.getMonth() - i);
-      last6Months.push({
-        name: date.toLocaleString('default', { month: 'short' }),
-        revenue: 0,
-        orders: 0
+  useEffect(() => {
+    if (loading) return;
+    const ctx = gsap.context(() => {
+      gsap.from(".stat-card", {
+        y: 30, opacity: 0, stagger: 0.1, duration: 0.8, ease: "power3.out",
       });
-    }
-
-    allOrders.forEach(order => {
-      const orderDate = new Date(order.date);
-      const monthIndex = last6Months.findIndex(m => 
-        m.name === orderDate.toLocaleString('default', { month: 'short' })
-      );
-      if (monthIndex !== -1) {
-        last6Months[monthIndex].revenue += parseFloat(order.amount || 0);
-        last6Months[monthIndex].orders += 1;
-      }
-    });
-
-    setRevenueData(last6Months);
-  };
-
-  const generateCategoryData = (products, allOrders) => {
-    const categoryStats = {};
-    
-    // Initialize categories
-    const allCategories = [...new Set(products.map(p => p.category || 'other'))];
-    allCategories.forEach(cat => {
-      categoryStats[cat] = {
-        name: cat,
-        products: 0,
-        revenue: 0,
-        orders: 0
-      };
-    });
-
-    // Count products per category
-    products.forEach(product => {
-      const category = product.category || 'other';
-      categoryStats[category].products += 1;
-    });
-
-    // Calculate revenue and orders per category
-    allOrders.forEach(order => {
-      order.items?.forEach(item => {
-        const category = item.category || 'other';
-        if (categoryStats[category]) {
-          categoryStats[category].revenue += parseFloat(item.price || 0) * (item.quantity || 1);
-          categoryStats[category].orders += 1;
-        }
+      gsap.from(".table-row", {
+        x: -20, opacity: 0, stagger: 0.05, duration: 0.6, ease: "power2.out", delay: 0.4,
       });
-    });
+    }, dashboardRef);
+    return () => ctx.revert();
+  }, [loading]);
 
-    const categoryArray = Object.values(categoryStats).map(cat => ({
-      ...cat,
-      revenue: parseFloat(cat.revenue.toFixed(2))
-    }));
+  const filtered = orders.filter((o) => {
+    const term = search.toLowerCase();
+    return (
+      o._id?.toLowerCase().includes(term) ||
+      o.shippingAddress?.address?.toLowerCase().includes(term) ||
+      o.status?.toLowerCase().includes(term)
+    );
+  });
 
-    setCategoryData(categoryArray);
-  };
-
-  // Calculate total revenue
-  const totalRevenue = fullOrders.reduce((sum, order) => sum + parseFloat(order.amount || 0), 0);
-  const monthlyGrowth = 12.5; // This could be calculated from actual data
-
-  const stats = [
-    { 
-      title: "Total Users", 
-      value: peoples, 
-      icon: Users, 
-      description: "Active customers",
-      trend: "+5.2%",
-      trendUp: true,
-      color: "from-blue-500 to-blue-600"
-    },
-    { 
-      title: "Total Orders", 
-      value: fullOrders.length, 
-      icon: ShoppingCart, 
-      description: "All time orders",
-      trend: "+12.4%",
-      trendUp: true,
-      color: "from-green-500 to-green-600"
-    },
-    { 
-      title: "Products", 
-      value: products.length, 
-      icon: Package,  
-      description: "In inventory",
-      trend: "+2.1%",
-      trendUp: true,
-      color: "from-purple-500 to-purple-600"
-    },
-    { 
-      title: "Revenue", 
-      value: `₹${totalRevenue.toLocaleString()}`, 
-      icon: IndianRupeeIcon, 
-      description: "Total earnings",
-      trend: `+${monthlyGrowth}%`,
-      trendUp: true,
-      color: "from-orange-500 to-orange-600"
-    },
-  ];
-
-  // Custom tooltip for charts
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white p-4 rounded-lg shadow-lg border border-gray-200">
-          <p className="font-semibold text-gray-800">{label}</p>
-          {payload.map((entry, index) => (
-            <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {entry.name}: {entry.name === 'revenue' ? '₹' : ''}{entry.value.toLocaleString()}
-            </p>
-          ))}
-        </div>
-      );
+  const statusStyle = (status) => {
+    switch (status) {
+      case "delivered": return "bg-green-500/10 text-green-400";
+      case "pending":   return "bg-yellow-500/10 text-yellow-400";
+      case "cancelled": return "bg-red-500/10 text-red-400";
+      case "shipped":   return "bg-blue-500/10 text-blue-400";
+      case "confirmed": return "bg-purple-500/10 text-purple-400";
+      default:          return "bg-gray-500/10 text-gray-400";
     }
-    return null;
   };
-
-  if (loading) {
-    return (
-      <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <AdminNav setSidebarOpen={setSidebarOpen} />
-          <div><Loaders/></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <AdminNav setSidebarOpen={setSidebarOpen} />
-          <main className="flex-1 overflow-y-auto flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <BarChart3 className="h-8 w-8 text-red-500" />
-              </div>
-              <div className="text-lg text-red-600 font-semibold">{error}</div>
-              <p className="text-gray-500 mt-2">Please try refreshing the page</p>
-            </div>
-          </main>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <AdminNav setSidebarOpen={setSidebarOpen} />
+    <div ref={dashboardRef} className="min-h-screen bg-[#0D0D0D] text-white">
+      {/* <Navbar /> */}
 
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-              Dashboard Overview
-            </h1>
-            <p className="text-gray-600 mt-2 flex items-center">
-              <Calendar className="h-4 w-4 mr-2" />
-              Welcome back! Here's what's happening today.
-            </p>
-          </div>
+      <div className="flex pt-5">
+        {/* Render Sidebar Component */}
+        <Sidebar />
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4 mb-8">
-            {stats.map((stat, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-xl bg-gradient-to-r ${stat.color} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                    <stat.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <div className={`flex items-center text-sm font-medium ${stat.trendUp ? 'text-green-600' : 'text-red-600'}`}>
-                    {stat.trendUp ? <ArrowUpRight className="h-4 w-4 mr-1" /> : <ArrowDownRight className="h-4 w-4 mr-1" />}
-                    {stat.trend}
-                  </div>
+        <main className="flex-1 p-6 lg:p-12 overflow-hidden">
+          <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#0bdf47] mb-2">
+                Admin Console
+              </p>
+              <h1 className="text-5xl font-black uppercase tracking-tighter">
+                Dashboard
+              </h1>
+            </div>
+          </header>
+
+          {/* STATS SECTION */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
+            {[
+              { label: "Total Revenue", val: `₹${stats.revenue.toFixed(2)}`, icon: <TrendingUp className="text-[#0bdf47]" /> },
+              { label: "Total Orders", val: stats.orders, icon: <ShoppingBag className="text-[#0bdf47]" /> },
+              { label: "Total Customers", val: stats.customers, icon: <Users className="text-[#0bdf47]" /> },
+              { label: "Monthly Growth", val: stats.growth, icon: <ArrowUpRight className="text-[#0bdf47]" /> },
+            ].map((stat, i) => (
+              <div key={i} className="stat-card bg-[#1A1A1A] border border-white/5 p-8 rounded-[2.5rem] relative overflow-hidden">
+                <div className="relative z-10">
+                  <div className="mb-4">{stat.icon}</div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">{stat.label}</p>
+                  <h3 className="text-3xl font-black">{stat.val}</h3>
                 </div>
-                <div className="space-y-1">
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                  <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <p className="text-xs text-gray-500">{stat.description}</p>
-                </div>
+                <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-[#0bdf47] blur-[100px] opacity-10 rounded-full" />
               </div>
             ))}
           </div>
 
-          {/* Charts and Orders Section */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
-            {/* Revenue Chart */}
-            <div className="xl:col-span-2 bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                  <TrendingUp className="h-5 w-5 text-blue-500 mr-2" />
-                  Revenue Overview
-                </h2>
-                <div className="flex items-center space-x-4 text-sm">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                    <span className="text-gray-600">Revenue</span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                    <span className="text-gray-600">Orders</span>
-                  </div>
-                </div>
-              </div>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={revenueData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="name" 
-                      stroke="#6B7280"
-                      fontSize={12}
-                    />
-                    <YAxis 
-                      stroke="#6B7280"
-                      fontSize={12}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Bar 
-                      dataKey="revenue" 
-                      name="Revenue (₹)" 
-                      fill="#3B82F6" 
-                      radius={[4, 4, 0, 0]}
-                    />
-                    <Bar 
-                      dataKey="orders" 
-                      name="Orders" 
-                      fill="#10B981" 
-                      radius={[4, 4, 0, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+          {/* ORDERS TABLE */}
+          <div className="bg-[#1A1A1A] border border-white/5 rounded-[3rem] p-8 lg:p-12 shadow-2xl">
+            <div className="flex items-center justify-between mb-10">
+              <h2 className="text-2xl font-black uppercase tracking-tight italic">Live Orders</h2>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+                <input
+                  type="text"
+                  placeholder="Search orders..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="bg-black/20 border border-white/5 rounded-full py-2 pl-10 pr-6 text-xs outline-none focus:border-[#0bdf47]/50 transition-all"
+                />
               </div>
             </div>
 
-            {/* Category Distribution */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                <Package className="h-5 w-5 text-purple-500 mr-2" />
-                Category Distribution
-              </h2>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="products"
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={CATEGORY_COLORS[entry.name] || COLORS[index % COLORS.length]} 
-                        />
+            {loading ? (
+              <div className="flex justify-center py-16">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-[#0bdf47]" />
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="border-b border-white/5">
+                      {["Order ID", "Customer", "Items", "Status", "Amount", "Date"].map((h) => (
+                        <th key={h} className="pb-4 text-[10px] font-black uppercase tracking-widest text-gray-500">{h}</th>
                       ))}
-                    </Pie>
-                    <Tooltip formatter={(value) => [value, 'Products']} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Orders and Category Performance */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-            {/* Recent Orders */}
-            <div className="xl:col-span-2 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-              <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                  <ShoppingCart className="h-5 w-5 text-blue-500 mr-2" /> 
-                  Recent Orders
-                </h2>
-                <button
-                  onClick={() => navigate("/allorders")}
-                  className="flex items-center text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
-                >
-                  <Eye className="h-4 w-4 mr-1" /> 
-                  View All
-                </button>
-              </div>
-
-              {orders.length === 0 ? (
-                <div className="p-8 text-center">
-                  <ShoppingCart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg">No orders found</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-100">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {filtered.map((order) => (
+                      <tr key={order._id} className="table-row group hover:bg-white/[0.02] transition-colors">
+                        <td className="py-6 font-mono text-xs text-gray-400">#{order._id.slice(-6).toUpperCase()}</td>
+                        <td className="py-6">
+                           <p className="font-bold text-sm">{order.shippingAddress?.address || "N/A"}</p>
+                           <p className="text-[10px] text-gray-500">{order.shippingAddress?.city}</p>
+                        </td>
+                        <td className="py-6">
+                          <div className="flex flex-col gap-1">
+                            {order.items.map((item, i) => (
+                              <span key={i} className="text-xs text-gray-400">{item.name} × {item.quantity}</span>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="py-6">
+                          <span className={`px-3 py-1 text-[10px] font-black uppercase rounded-lg ${statusStyle(order.status)}`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="py-6 font-black">₹{order.totalAmount}</td>
+                        <td className="py-6 text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString("en-IN")}</td>
                       </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-100">
-                      {orders.map((order) => (
-                        <tr 
-                          key={order.id} 
-                          className="hover:bg-blue-50 transition-colors duration-200 cursor-pointer"
-                          onClick={() => navigate("/allorders")}
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm font-semibold text-gray-900 bg-blue-100 px-2 py-1 rounded">
-                              #{order.id.slice(-8)}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">{order.customer}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {order.date}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm font-semibold text-green-600">
-                              ₹{parseFloat(order.amount || 0).toLocaleString()}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-
-            {/* Category Performance */}
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
-                <BarChart3 className="h-5 w-5 text-green-500 mr-2" />
-                Category Performance
-              </h2>
-              <div className="space-y-4">
-                {categoryData.slice(0, 5).map((category, index) => (
-                  <div key={category.name} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors duration-200">
-                    <div className="flex items-center space-x-3">
-                      <div 
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: CATEGORY_COLORS[category.name] || COLORS[index % COLORS.length] }}
-                      ></div>
-                      <span className="text-sm font-medium text-gray-700">{category.name}</span>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs text-gray-500">{category.products} products</div>
-                    </div>
-                  </div>
-                ))}
+                    ))}
+                  </tbody>
+                </table>
               </div>
-              <div className="mt-6 pt-4 border-t border-gray-100">
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">Total Categories</p>
-                      <p className="text-2xl font-bold text-gray-900">{categoryData.length}</p>
-                    </div>
-                    <Package className="h-8 w-8 text-blue-500" />
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </main>
       </div>

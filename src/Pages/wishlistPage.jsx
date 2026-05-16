@@ -168,6 +168,7 @@ import { toast } from "react-toastify";
 import { Trash2, ShoppingBag, ArrowRight, HeartCrack, Plus } from "lucide-react";
 import { gsap } from "gsap";
 import Navbar from "../component/Navbar";
+import api from "../utils/axiosInstance";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -179,11 +180,8 @@ const Wishlist = () => {
 
   const fetchWishlist = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/wishlist", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setWishlist(data.products || []);
+      const res = await api.get("/wishlist");
+      setWishlist(res.data.products || []);
     } catch (err) {
       console.error(err);
       toast.error("Failed to load wishlist");
@@ -218,12 +216,8 @@ const Wishlist = () => {
 
   const removeFromWishlist = async (productId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/wishlist/${productId}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setWishlist(data.wishlist.products);
+      const res = await api.delete(`/wishlist/${productId}`);
+      setWishlist(res.data.wishlist.products);
       toast.warning("Removed from wishlist");
     } catch (err) {
       console.error(err);
@@ -232,10 +226,7 @@ const Wishlist = () => {
 
   const clearWishlist = async () => {
     try {
-      await fetch("http://localhost:5000/api/wishlist", {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete("/wishlist");
       setWishlist([]);
       toast.success("Wishlist cleared");
     } catch (err) {
@@ -245,14 +236,7 @@ const Wishlist = () => {
 
   const addToCart = async (productId) => {
     try {
-      await fetch("http://localhost:5000/api/cart/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productId, quantity: 1 }),
-      });
+      await api.post("/cart/add", { productId, quantity: 1 });
       toast.success("Added to cart");
     } catch (err) {
       console.error(err);

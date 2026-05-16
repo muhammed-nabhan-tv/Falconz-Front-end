@@ -18,7 +18,6 @@ const Navbar = () => {
   const navRef = useRef(null);
   const { user } = useAuth();
   const location = useLocation();
-
   // FIX: Run animation on every mount and location change
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -91,11 +90,11 @@ const Navbar = () => {
           </Link>
 
           {/* Cart */}
-          <Link to="/cart" className="relative p-2.5 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all">
+          <Link to={`/cart`} className="relative p-2.5 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all">
             <ShoppingBag size={20} />
-            <span className="absolute top-1 right-1 w-4 h-4 bg-green-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full">
+            {/* <span className="absolute top-1 right-1 w-4 h-4 bg-green-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full">
               0
-            </span>
+            </span> */}
           </Link>
 
           {/* Profile (Desktop) */}

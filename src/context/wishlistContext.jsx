@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import api from "../utils/axiosInstance";
 
 const WishlistContext = createContext();
 
@@ -18,17 +19,8 @@ export const WishlistProvider = ({ children }) => {
   // ✅ Fetch Wishlist
   const fetchWishlist = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/wishlist", {
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setWishlist(data.products || []);
-      }
+      const res = await api.get("/wishlist");
+      setWishlist(res.data.products || []);
     } catch (error) {
       console.error("Fetch wishlist error:", error);
     }
@@ -37,20 +29,8 @@ export const WishlistProvider = ({ children }) => {
   // ✅ Add to Wishlist
   const addToWishlist = async (productId) => {
     try {
-      const res = await fetch("http://localhost:5000/api/wishlist/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
-        body: JSON.stringify({ productId }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setWishlist(data.wishlist.products);
-      }
+      const res = await api.post("/wishlist/add", { productId });
+      setWishlist(res.data.wishlist.products);
     } catch (error) {
       console.error("Add wishlist error:", error);
     }
@@ -59,21 +39,8 @@ export const WishlistProvider = ({ children }) => {
   // ✅ Remove from Wishlist
   const removeFromWishlist = async (productId) => {
     try {
-      const res = await fetch(
-        `http://localhost:5000/api/wishlist/${productId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${getToken()}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setWishlist(data.wishlist.products);
-      }
+      const res = await api.delete(`/wishlist/${productId}`);
+      setWishlist(res.data.wishlist.products);
     } catch (error) {
       console.error("Remove wishlist error:", error);
     }
@@ -82,13 +49,7 @@ export const WishlistProvider = ({ children }) => {
   // ✅ Clear Wishlist
   const clearWishlist = async () => {
     try {
-      await fetch("http://localhost:5000/api/wishlist", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      });
-
+      await api.delete("/wishlist");
       setWishlist([]);
     } catch (error) {
       console.error("Clear wishlist error:", error);

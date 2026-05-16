@@ -1,579 +1,383 @@
-// import React, { useEffect, useState } from "react";
-// import { UserIcon, ShoppingBagIcon, HeartIcon, EnvelopeIcon, PencilSquareIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
+// import React, { useEffect, useState, useRef } from "react";
+// import { Package, User, Mail, Calendar, MapPin, Box, ArrowUpRight } from "lucide-react";
+// import { gsap } from "gsap";
+// import Navbar from "../component/Navbar";
 
-// const ProfilePage = () => {
-//   const [user, setUser] = useState({
-//     name: "",
-//     email: "",
-//     cart: [],
-//     wishlist: [],
-//   });
-  
-//   const [editMode, setEditMode] = useState({
-//     name: false,
-//     email: false
-//   });
-  
-//   const [editedUser, setEditedUser] = useState({
-//     name: "",
-//     email: ""
-//   });
+// const Profile = () => {
+//   const [orders, setOrders] = useState([]);
+//   const [user, setUser] = useState(null);
+//   const containerRef = useRef(null);
+
+//   const getToken = () => {
+//     const user = JSON.parse(localStorage.getItem("user"));
+//     return user?.token;
+//   };
 
 //   useEffect(() => {
-//     const savedUser = JSON.parse(localStorage.getItem("user"));
-//     if (savedUser) {
-//       setUser(savedUser);
-//       setEditedUser({
-//         name: savedUser.name || "",
-//         email: savedUser.email || ""
-//       });
-//     }
+//     const storedUser = JSON.parse(localStorage.getItem("user"));
+//     setUser(storedUser);
 //   }, []);
 
-//   const handleLogout = () => {
-//     localStorage.removeItem("user");
-//     window.location.href = "/Login";
-//   };
-
-//   const handleEdit = (field) => {
-//     setEditMode(prev => ({
-//       ...prev,
-//       [field]: true
-//     }));
-//   };
-
-//   const handleSave = (field) => {
-//     const updatedUser = {
-//       ...user,
-//       [field]: editedUser[field]
+//   useEffect(() => {
+//     const fetchOrders = async () => {
+//       try {
+//         const res = await fetch("http://localhost:5000/api/orders/my-orders", {
+//           headers: {
+//             Authorization: `Bearer ${getToken()}`,
+//           },
+//         });
+//         const data = await res.json();
+//         if (res.ok) {
+//           setOrders(data);
+//         }
+//       } catch (error) {
+//         console.error(error);
+//       }
 //     };
-    
-//     setUser(updatedUser);
-//     localStorage.setItem("user", JSON.stringify(updatedUser));
-    
-//     setEditMode(prev => ({
-//       ...prev,
-//       [field]: false
-//     }));
-//   };
+//     fetchOrders();
+//   }, []);
 
-//   const handleCancel = (field) => {
-//     setEditedUser(prev => ({
-//       ...prev,
-//       [field]: user[field]
-//     }));
-    
-//     setEditMode(prev => ({
-//       ...prev,
-//       [field]: false
-//     }));
-//   };
-
-//   const handleInputChange = (field, value) => {
-//     setEditedUser(prev => ({
-//       ...prev,
-//       [field]: value
-//     }));
-//   };
+//   // GSAP Entrance Animation
+//   useEffect(() => {
+//     const ctx = gsap.context(() => {
+//       gsap.from(".profile-card", {
+//         y: 40,
+//         opacity: 0,
+//         duration: 0.8,
+//         ease: "power3.out",
+//       });
+//       gsap.from(".order-card", {
+//         x: -20,
+//         opacity: 0,
+//         stagger: 0.1,
+//         duration: 0.6,
+//         ease: "power2.out",
+//         delay: 0.3
+//       });
+//     }, containerRef);
+//     return () => ctx.revert();
+//   }, [orders]);
 
 //   return (
-//     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex flex-col items-center py-12 px-4">
-//       {/* Header */}
-//       <div className="text-center mb-12">
-//         <h1 className="text-4xl font-bold text-gray-800 mb-4">
-//           My Profile
-//         </h1>
-//         <p className="text-gray-600">Manage your account and preferences</p>
-//       </div>
+//     <div ref={containerRef} className="min-h-screen bg-[#0D0D0D] text-white selection:bg-[#98D8AA] selection:text-black">
+//       <Navbar />
 
-//       <div className="w-full max-w-4xl flex flex-col lg:flex-row gap-8">
-//         {/* User Profile Card */}
-//         <div className="flex-1 flex flex-col gap-6">
-//           {/* Profile Overview */}
-//           <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-//             <div className="flex flex-col items-center text-center">
-//               <div className="relative mb-6">
-//                 <div className="w-28 h-28 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
-//                   <UserIcon className="h-12 w-12 text-white" />
-//                 </div>
-//               </div>
-              
-//               <h2 className="text-2xl font-bold text-gray-800 mb-2">{user.name || "Guest User"}</h2>
-//               <div className="flex items-center gap-2 text-gray-600 mb-6">
-//                 <EnvelopeIcon className="h-4 w-4" />
-//                 <p className="text-sm">{user.email || "guest@example.com"}</p>
-//               </div>
-              
-//               <div className="w-20 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full mb-6"></div>
-              
-//               <div className="flex gap-8">
-//                 <div className="text-center">
-//                   <div className="text-xl font-bold text-gray-800">{user.cart?.length || 0}</div>
-//                   <div className="text-gray-500 text-sm">Cart Items</div>
-//                 </div>
-//                 <div className="text-center">
-//                   <div className="text-xl font-bold text-gray-800">{user.wishlist?.length || 0}</div>
-//                   <div className="text-gray-500 text-sm">Wishlist</div>
-//                 </div>
-//               </div>
-//             </div>
+//       <section className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+//         <div className="space-y-4 mb-12">
+//           <div className="inline-block px-4 py-1.5 border border-white/20 rounded-full text-xs font-black tracking-widest uppercase bg-white/5 text-[#0bdf47]">
+//             Member Portal
 //           </div>
-
-//           {/* Quick Stats */}
-//           <div className="grid grid-cols-2 gap-4">
-//             <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100">
-//               <div className="flex items-center gap-3">
-//                 <div className="p-2 bg-emerald-100 rounded-lg">
-//                   <ShoppingBagIcon className="h-5 w-5 text-emerald-600" />
-//                 </div>
-//                 <div>
-//                   <div className="text-lg font-bold text-gray-800">{user.cart?.length || 0}</div>
-//                   <div className="text-gray-500 text-xs">In Cart</div>
-//                 </div>
-//               </div>
-//             </div>
-            
-//             <div className="bg-white rounded-xl p-4 shadow-lg border border-gray-100">
-//               <div className="flex items-center gap-3">
-//                 <div className="p-2 bg-rose-100 rounded-lg">
-//                   <HeartIcon className="h-5 w-5 text-rose-600" />
-//                 </div>
-//                 <div>
-//                   <div className="text-lg font-bold text-gray-800">{user.wishlist?.length || 0}</div>
-//                   <div className="text-gray-500 text-xs">Wishlisted</div>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
+//           <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none">
+//             Your <span className="text-transparent border-text">Profile</span>
+//           </h1>
 //         </div>
 
-//         {/* Account Details */}
-//         <div className="flex-1">
-//           <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-//             <div className="flex items-center gap-3 mb-6">
-//               <div className="p-2 bg-emerald-100 rounded-lg">
-//                 <UserIcon className="h-5 w-5 text-emerald-600" />
+//         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+//           {/* --- LEFT: USER INFO BENTO --- */}
+//           <div className="lg:col-span-4 space-y-6">
+//             <div className="profile-card bg-[#1A1A1A] border border-white/5 p-10 rounded-[3rem] relative overflow-hidden">
+//               <div className="relative z-10 space-y-8">
+//                 <div className="w-20 h-20 bg-[#0bdf47] rounded-[2rem] flex items-center justify-center text-black shadow-[0_0_40px_rgba(11,223,71,0.2)]">
+//                   <User size={40} />
+//                 </div>
+                
+//                 <div className="space-y-4">
+//                   <div>
+//                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-1">Full Name</p>
+//                     <h2 className="text-2xl font-bold">{user?.name || "Member Name"}</h2>
+//                   </div>
+//                   <div>
+//                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-1">Email Address</p>
+//                     <p className="text-gray-300 font-medium">{user?.email || "email@example.com"}</p>
+//                   </div>
+//                 </div>
+
+//                 <div className="pt-6 border-t border-white/5 flex items-center gap-2 text-[#0bdf47] text-xs font-black uppercase tracking-widest">
+//                   <Calendar size={14} /> Registered Member
+//                 </div>
 //               </div>
-//               <h3 className="text-xl font-bold text-gray-800">Account Information</h3>
+//               <div className="absolute -right-10 -bottom-10 opacity-5">
+//                 <User size={200} />
+//               </div>
 //             </div>
-
-//             <div className="space-y-6">
-//               {/* Name Field */}
-//               <div>
-//                 <label className="text-gray-700 font-medium mb-2 block text-sm">Full Name</label>
-//                 <div className="relative">
-//                   {editMode.name ? (
-//                     <div className="flex gap-2">
-//                       <input
-//                         type="text"
-//                         value={editedUser.name}
-//                         onChange={(e) => handleInputChange('name', e.target.value)}
-//                         className="flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all duration-200"
-//                         autoFocus
-//                       />
-//                       <div className="flex gap-1">
-//                         <button
-//                           onClick={() => handleSave('name')}
-//                           className="p-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all duration-200"
-//                         >
-//                           <CheckIcon className="h-4 w-4" />
-//                         </button>
-//                         <button
-//                           onClick={() => handleCancel('name')}
-//                           className="p-3 bg-gray-200 text-gray-600 rounded-xl hover:bg-gray-300 transition-all duration-200"
-//                         >
-//                           <XMarkIcon className="h-4 w-4" />
-//                         </button>
-//                       </div>
-//                     </div>
-//                   ) : (
-//                     <div className="flex gap-2">
-//                       <input
-//                         type="text"
-//                         value={user.name}
-//                         disabled
-//                         className="flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 cursor-not-allowed"
-//                       />
-//                       <button
-//                         onClick={() => handleEdit('name')}
-//                         className="p-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all duration-200"
-//                       >
-//                         <PencilSquareIcon className="h-4 w-4" />
-//                       </button>
-//                     </div>
-//                   )}
+// {/* 
+//             <div className="profile-card bg-white/5 border border-white/10 p-8 rounded-[2.5rem] flex items-center justify-between group cursor-pointer hover:bg-white/10 transition-all">
+//                 <div className="flex items-center gap-4">
+//                     <MapPin className="text-gray-500" />
+//                     <span className="font-bold uppercase text-xs tracking-widest">Saved Addresses</span>
 //                 </div>
-//               </div>
+//                 <ArrowUpRight size={20} className="text-gray-600 group-hover:text-[#0bdf47] transition-colors" />
+//             </div> */}
+//           </div>
 
-//               {/* Email Field */}
-//               <div>
-//                 <label className="text-gray-700 font-medium mb-2 block text-sm">Email Address</label>
-//                 <div className="relative">
-//                   {editMode.email ? (
-//                     <div className="flex gap-2">
-//                       <input
-//                         type="email"
-//                         value={editedUser.email}
-//                         onChange={(e) => handleInputChange('email', e.target.value)}
-//                         className="flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all duration-200"
-//                         autoFocus
-//                       />
-//                       <div className="flex gap-1">
-//                         <button
-//                           onClick={() => handleSave('email')}
-//                           className="p-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all duration-200"
-//                         >
-//                           <CheckIcon className="h-4 w-4" />
-//                         </button>
-//                         <button
-//                           onClick={() => handleCancel('email')}
-//                           className="p-3 bg-gray-200 text-gray-600 rounded-xl hover:bg-gray-300 transition-all duration-200"
-//                         >
-//                           <XMarkIcon className="h-4 w-4" />
-//                         </button>
-//                       </div>
-//                     </div>
-//                   ) : (
-//                     <div className="flex gap-2">
-//                       <input
-//                         type="email"
-//                         value={user.email}
-//                         disabled
-//                         className="flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 cursor-not-allowed"
-//                       />
-//                       <button
-//                         onClick={() => handleEdit('email')}
-//                         className="p-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all duration-200"
-//                       >
-//                         <PencilSquareIcon className="h-4 w-4" />
-//                       </button>
-//                     </div>
-//                   )}
-//                 </div>
-//               </div>
-
-//               {/* Stats Cards */}
-//               <div className="grid grid-cols-1 gap-3 mt-6">
-//                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-//                   <div className="flex justify-between items-center">
-//                     <div className="flex items-center gap-3">
-//                       <ShoppingBagIcon className="h-5 w-5 text-emerald-600" />
-//                       <span className="text-gray-700 font-medium">Shopping Cart</span>
-//                     </div>
-//                     <span className="text-lg font-bold text-emerald-600">{user.cart?.length || 0}</span>
-//                   </div>
-//                 </div>
-
-//                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-//                   <div className="flex justify-between items-center">
-//                     <div className="flex items-center gap-3">
-//                       <HeartIcon className="h-5 w-5 text-rose-600" />
-//                       <span className="text-gray-700 font-medium">Wishlist Items</span>
-//                     </div>
-//                     <span className="text-lg font-bold text-rose-600">{user.wishlist?.length || 0}</span>
-//                   </div>
-//                 </div>
-//               </div>
-
-//               {/* Logout Button */}
-//               <button
-//                 onClick={handleLogout}
-//                 className="w-full mt-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-medium rounded-xl shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
-//               >
-//                 <span className="flex items-center justify-center gap-2">
-//                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-//                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-//                   </svg>
-//                   Sign Out
+//           {/* --- RIGHT: ORDERS HISTORY --- */}
+//           <div className="lg:col-span-8 bg-[#1A1A1A] border border-white/5 p-10 rounded-[3rem]">
+//             <div className="flex items-center justify-between mb-8">
+//                 <h2 className="text-3xl font-bold uppercase tracking-tight flex items-center gap-3">
+//                     <Package className="text-[#0bdf47]" /> Order History
+//                 </h2>
+//                 <span className="bg-white/5 px-4 py-1 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-widest">
+//                     {orders.length} Orders
 //                 </span>
-//               </button>
+//             </div>
+
+//             <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+//               {orders.length === 0 ? (
+//                 <div className="text-center py-20 bg-white/5 rounded-[2rem] border border-dashed border-white/10">
+//                     <Box size={48} className="mx-auto text-gray-700 mb-4" />
+//                     <p className="text-gray-500 font-bold uppercase tracking-widest text-sm">No orders found yet</p>
+//                 </div>
+//               ) : (
+//                 orders.map((order) => (
+//                   <div
+//                     key={order._id}
+//                     className=" group bg-white/5 border border-white/5 p-6 rounded-[2rem] hover:border-[#0bdf47]/20 transition-all"
+//                   >
+//                     <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+//                       <div>
+//                         <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Transaction ID</p>
+//                         <p className="text-sm font-mono text-gray-300">{order._id}</p>
+//                       </div>
+//                       <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest w-fit ${
+//                         order.status === 'Completed' ? 'bg-green-500/10 text-green-500' : 'bg-[#0bdf47]/10 text-[#0bdf47]'
+//                       }`}>
+//                         {order.status}
+//                       </div>
+//                     </div>
+
+//                     <div className="space-y-3 mb-6">
+//                       {order.items.map((item, index) => (
+//                         <div key={index} className="flex justify-between items-center bg-black/20 p-3 rounded-xl border border-white/5">
+//                           <span className="font-bold text-sm uppercase tracking-tight">{item.name}</span>
+//                           <span className="text-gray-500 text-xs font-bold">
+//                             ₹{item.price} <span className="mx-1">×</span> {item.quantity}
+//                           </span>
+//                         </div>
+//                       ))}
+//                     </div>
+
+//                     <div className="flex justify-between items-center pt-4 border-t border-white/5">
+//                       <span className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Total Amount</span>
+//                       <span className="text-2xl font-black text-[#0bdf47]">₹{order.totalAmount}</span>
+//                     </div>
+//                   </div>
+//                 ))
+//               )}
 //             </div>
 //           </div>
 //         </div>
-//       </div>
+//       </section>
+
+//       <style dangerouslySetInnerHTML={{ __html: `
+//         .border-text {
+//           -webkit-text-stroke: 1.5px rgba(255,255,255,0.4);
+//         }
+//         .custom-scrollbar::-webkit-scrollbar {
+//           width: 4px;
+//         }
+//         .custom-scrollbar::-webkit-scrollbar-thumb {
+//           background: #333;
+//           border-radius: 10px;
+//         }
+//         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+//           background: #0bdf47;
+//         }
+//       `}} />
 //     </div>
 //   );
 // };
 
-// export default ProfilePage;
+// export default Profile;
 
+import React, { useEffect, useState, useRef } from "react";
+import { Package, User, Calendar, Box, LogOut, ArrowRight } from "lucide-react";
+import { gsap } from "gsap";
+import Navbar from "../component/Navbar";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate, Link } from "react-router-dom";
+import api from "../utils/axiosInstance";
 
-import React, { useEffect, useState } from "react";
-import { UserIcon, ShoppingBagIcon, HeartIcon, EnvelopeIcon, PencilSquareIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import Footer from "../component/Footer";
-// import Navbar from "../component/Navbar";
+const Profile = () => {
+  const [orders, setOrders] = useState([]);
+  const [user, setUser] = useState(null);
+  const containerRef = useRef(null);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
-const ProfilePage = () => {
-  const [user, setUser] = useState({
-    name: "",
-    email: "",
-    cart: [],
-    wishlist: [],
-  });
-  
-  const [editMode, setEditMode] = useState({
-    name: false,
-    email: false
-  });
-  
-  const [editedUser, setEditedUser] = useState({
-    name: "",
-    email: ""
-  });
+  const getToken = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    return user?.token;
+  };
 
-  // useEffect(() => {
-  //   // Get logged-in user from localStorage (assuming this is where you store login data)
-  //   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-    
-  //   if (loggedInUser) {
-  //     // If you have a separate user data structure, use that
-  //     const userData = JSON.parse(localStorage.getItem("user")) || loggedInUser;
-      
-  //     setUser({
-  //       name: userData.name || loggedInUser.name || "User",
-  //       email: userData.email || loggedInUser.email || "user@example.com",
-  //       cart: userData.cart || loggedInUser.cart || [],
-  //       wishlist: userData.wishlist || loggedInUser.wishlist || [],
-  //     });
-      
-  //     setEditedUser({
-  //       name: userData.name || loggedInUser.name || "User",
-  //       email: userData.email || loggedInUser.email || "user@example.com"
-  //     });
-  //   } else {
-  //     // If no user is logged in, redirect to login
-  //     window.location.href = "/Login";
-  //   }
-  // }, []);
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    setUser(storedUser);
+  }, []);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await api.get("/orders/my-orders");
+        setOrders(res.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(".profile-card", {
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        ease: "power3.out",
+      });
+      gsap.from(".order-card", {
+        x: -20,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 0.6,
+        ease: "power2.out",
+        delay: 0.3
+      });
+    }, containerRef);
+    return () => ctx.revert();
+  }, [orders]);
 
   const handleLogout = () => {
-    localStorage.removeItem("loggedInUser");
-    localStorage.removeItem("user");
-    window.location.href = "/Login";
+    logout();
+    navigate("/login");
   };
 
-  const handleEdit = (field) => {
-    setEditMode(prev => ({
-      ...prev,
-      [field]: true
-    }));
-  };
-
-  const handleSave = (field) => {
-    const updatedUser = {
-      ...user,
-      [field]: editedUser[field]
-    };
-    
-    // Update both states
-    setUser(updatedUser);
-    
-    // Update localStorage for both loggedInUser and user data
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser")) || {};
-    localStorage.setItem("loggedInUser", JSON.stringify({
-      ...loggedInUser,
-      [field]: editedUser[field]
-    }));
-    
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    
-    setEditMode(prev => ({
-      ...prev,
-      [field]: false
-    }));
-  };
-
-  const handleCancel = (field) => {
-    setEditedUser(prev => ({
-      ...prev,
-      [field]: user[field]
-    }));
-    
-    setEditMode(prev => ({
-      ...prev,
-      [field]: false
-    }));
-  };
-
-  const handleInputChange = (field, value) => {
-    setEditedUser(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  // --- LOGIC: Only show top 2 products/orders ---
+  const recentOrders = orders.slice(0, 2);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex flex-col items-center py-12 px-4">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-800 mb-4">
-          My Profile
-        </h1>
-        <p className="text-gray-600">Manage your account and preferences</p>
-      </div>
+    <div ref={containerRef} className="min-h-screen bg-[#0D0D0D] text-white selection:bg-[#98D8AA] selection:text-black">
+      <Navbar />
 
-      <div className="w-full max-w-4xl flex flex-col lg:flex-row gap-8">
-        {/* User Profile Card */}
-        <div className="flex-1 flex flex-col gap-6">
-          {/* Profile Overview */}
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-            <div className="flex flex-col items-center text-center">
-              <div className="relative mb-6">
-                <div className="w-28 h-28 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
-                  <UserIcon className="h-12 w-12 text-white" />
-                </div>
-              </div>
-              
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                {user.name || "Loading..."}
-              </h2>
-              <div className="flex items-center gap-2 text-gray-600 mb-6">
-                <EnvelopeIcon className="h-4 w-4" />
-                <p className="text-sm">{user.email || "Loading..."}</p>
-              </div>
-              
-              <div className="w-20 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full mb-6"></div>
-            
-            </div>
+      <section className="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+        <div className="space-y-4 mb-12 text-center md:text-left">
+          <div className="inline-block px-4 py-1.5 border border-white/20 rounded-full text-xs font-black tracking-widest uppercase bg-white/5 text-[#0bdf47]">
+            Member Portal
           </div>
+          <h1 className="text-6xl md:text-8xl font-black uppercase tracking-tighter leading-none">
+            Your <span className="text-transparent border-text">Profile</span>
+          </h1>
         </div>
 
-        {/* Account Details */}
-        <div className="flex-1">
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-emerald-100 rounded-lg">
-                <UserIcon className="h-5 w-5 text-emerald-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-800">Account Information</h3>
-            </div>
-
-            <div className="space-y-6">
-              {/* Name Field */}
-              <div>
-                <label className="text-gray-700 font-medium mb-2 block text-sm">Full Name</label>
-                <div className="relative">
-                  {editMode.name ? (
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={editedUser.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        className="flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all duration-200"
-                        autoFocus
-                      />
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => handleSave('name')}
-                          className="p-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all duration-200"
-                        >
-                          <CheckIcon className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleCancel('name')}
-                          className="p-3 bg-gray-200 text-gray-600 rounded-xl hover:bg-gray-300 transition-all duration-200"
-                        >
-                          <XMarkIcon className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={user.name}
-                        disabled
-                        className="flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 cursor-not-allowed"
-                      />
-                      <button
-                        onClick={() => handleEdit('name')}
-                        className="p-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all duration-200"
-                      >
-                        <PencilSquareIcon className="h-4 w-4" />
-                      </button>
-                    </div>
-                  )}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* --- LEFT: USER INFO BENTO --- */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="profile-card bg-[#1A1A1A] border border-white/5 p-10 rounded-[3rem] relative overflow-hidden shadow-2xl">
+              <div className="relative z-10 space-y-8">
+                <div className="w-20 h-20 bg-[#0bdf47] rounded-[2rem] flex items-center justify-center text-black shadow-[0_0_40px_rgba(11,223,71,0.2)]">
+                  <User size={40} />
                 </div>
-              </div>
-
-              {/* Email Field */}
-              <div>
-                <label className="text-gray-700 font-medium mb-2 block text-sm">Email Address</label>
-                <div className="relative">
-                  {editMode.email ? (
-                    <div className="flex gap-2">
-                      <input
-                        type="email"
-                        value={editedUser.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        className="flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all duration-200"
-                        autoFocus
-                      />
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => handleSave('email')}
-                          className="p-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all duration-200"
-                        >
-                          <CheckIcon className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleCancel('email')}
-                          className="p-3 bg-gray-200 text-gray-600 rounded-xl hover:bg-gray-300 transition-all duration-200"
-                        >
-                          <XMarkIcon className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <input
-                        type="email"
-                        value={user.email}
-                        disabled
-                        className="flex-1 p-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 cursor-not-allowed"
-                      />
-                      <button
-                        onClick={() => handleEdit('email')}
-                        className="p-3 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-all duration-200"
-                      >
-                        <PencilSquareIcon className="h-4 w-4" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Additional User Info */}
-              <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <UserIcon className="h-4 w-4 text-blue-600" />
+                
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-1">Full Name</p>
+                    <h2 className="text-2xl font-bold tracking-tight">{user?.name || "Member Name"}</h2>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-blue-800">Account Status</h4>
-                    <p className="text-xs text-blue-600">Active member since {new Date().toLocaleDateString()}</p>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-1">Email Address</p>
+                    <p className="text-gray-300 font-medium">{user?.email || "email@example.com"}</p>
                   </div>
                 </div>
-              </div>
 
-              {/* Logout Button */}
-              <button
-                onClick={handleLogout}
-                className="w-full mt-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-medium rounded-xl shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
-              >
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  Sign Out
-                </span>
-              </button>
+                <div className="pt-6 border-t border-white/5 space-y-6">
+                  <div className="flex items-center gap-2 text-[#0bdf47] text-xs font-black uppercase tracking-widest">
+                    <Calendar size={14} /> Registered Member
+                  </div>
+
+                  <button 
+                    onClick={handleLogout}
+                    className="group flex items-center justify-center gap-3 w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-500/10 hover:border-red-500/30 transition-all duration-300"
+                  >
+                    <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
+                    Logout Session
+                  </button>
+                </div>
+              </div>
+              <div className="absolute -right-10 -bottom-10 opacity-5 pointer-events-none">
+                <User size={200} />
+              </div>
+            </div>
+          </div>
+
+          {/* --- RIGHT: RECENT ORDERS --- */}
+          <div className="lg:col-span-8 bg-[#1A1A1A] border border-white/5 p-10 rounded-[3rem] shadow-2xl">
+            <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
+                <h2 className="text-3xl font-bold uppercase tracking-tight flex items-center gap-3">
+                    <Package className="text-[#0bdf47]" /> Recent Activity
+                </h2>
+                
+                {/* NAVIGATION BUTTON TO ALL ORDERS */}
+                <Link 
+                  to="/orders" 
+                  className="group flex items-center gap-2 px-6 py-2 bg-white/5 border border-white/10 rounded-full text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-[#0bdf47] hover:border-[#0bdf47]/50 transition-all"
+                >
+                    View All Orders <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+            </div>
+
+            <div className="space-y-4">
+              {recentOrders.length === 0 ? (
+                <div className="text-center py-20 bg-white/5 rounded-[2rem] border border-dashed border-white/10">
+                    <Box size={48} className="mx-auto text-gray-700 mb-4" />
+                    <p className="text-gray-500 font-bold uppercase tracking-widest text-sm">No orders found yet</p>
+                </div>
+              ) : (
+                recentOrders.map((order) => (
+                  <div
+                    key={order._id}
+                    className=" group bg-white/5 border border-white/5 p-6 rounded-[2rem] hover:border-[#0bdf47]/20 transition-all"
+                  >
+                    <div className="flex justify-between items-center mb-6">
+                      <div>
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">ID: {order._id.slice(-6)}</p>
+                        <div className={`mt-1 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest w-fit ${
+                          order.status === 'Completed' ? 'bg-green-500/10 text-green-500' : 'bg-[#0bdf47]/10 text-[#0bdf47]'
+                        }`}>
+                          {order.status}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest block">Total</span>
+                        <span className="text-2xl font-black text-[#0bdf47]">₹{order.totalAmount}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      {order.items.map((item, index) => (
+                        <div key={index} className="flex justify-between items-center bg-black/20 p-3 rounded-xl border border-white/5">
+                          <span className="font-bold text-[10px] uppercase tracking-tight">{item.name}</span>
+                          <span className="text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+                            {item.quantity} Unit{item.quantity > 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        .border-text {
+          -webkit-text-stroke: 1.5px rgba(255,255,255,0.4);
+        }
+      `}} />
     </div>
   );
 };
 
-export default ProfilePage;
+export default Profile;
