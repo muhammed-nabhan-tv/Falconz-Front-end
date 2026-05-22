@@ -13,7 +13,6 @@ const Cart = () => {
   const containerRef = useRef(null);
   // const total = cart.reduce((sum,item)=>{sum+item.price*item.quantity})
 
-  // console.log(total)
   // 🔁 Always load fresh cart
   useEffect(() => {
     fetchCart();
