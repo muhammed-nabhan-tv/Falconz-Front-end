@@ -11,7 +11,7 @@ const Cart = () => {
   const { cart, fetchCart, removeFromCart, clearCart,total } = useCart();
   const navigate = useNavigate();
   const containerRef = useRef(null);
-  // const total = cart.reduce((sum,item)=>{sum+item.price*item.quantity})
+
 
   // 🔁 Always load fresh cart
   useEffect(() => {
