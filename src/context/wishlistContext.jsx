@@ -9,7 +9,6 @@ export const WishlistProvider = ({ children }) => {
 
   // 🔑 get token (adjust based on your storage)
   const getToken = () => {
-    // return localStorage.getItem("token"); 
     // OR:
     const user = JSON.parse(localStorage.getItem("user"));
     return user?.token;
